@@ -1,0 +1,42 @@
+"turkce":
+{
+	"kullanici_adi": "Kullanıcı Adı",
+	"sifre": "Şifre",
+	"giris": "Giriş",
+	"cikis": "Çıkış",
+	"beni_hatirla": "Beni Hatırla",
+	"sifre_sifirlama": "Şifremi Unuttum",
+	"sifre_goster": "Şifreyi Göster",
+}
+
+"ingilizce":
+{
+	"kullanici_adi": "Username",
+	"sifre": "Password",
+	"giris": "Login",
+	"cikis": "Exit",
+	"beni_hatirla": "Remember Me",
+	"sifre_sifirlama": "Forgot Password",
+	"sifre_goster": "Show Password",
+}
+
+"fransızca":
+{
+	"kullanici_adi": "Nom d'utilisateur",
+	"sifre": "Mot de passe",
+	"giris": "Connexion",
+	"cikis": "Déconnexion",
+	"beni_hatirla": "Se souvenir de moi",
+	"sifre_sifirlama": "Mot de passe oublié",
+	"sifre_goster": "Afficher le mot de passe"
+}
+
+"çince": {
+    "kullanici_adi": "用户名",
+    "sifre": "密码",
+    "giris": "登录",
+    "cikis": "退出",
+    "beni_hatirla": "记住我",
+    "sifre_sifirlama": "忘记密码",
+    "sifre_goster": "显示密码"
+  }

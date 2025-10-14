@@ -1,0 +1,18 @@
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\Login_Ekranı.exe.config
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\Login_Ekranı.exe
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\Login_Ekranı.pdb
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.csproj.AssemblyReference.cache
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.Form1.resources
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.Properties.Resources.resources
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.csproj.GenerateResource.cache
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.csproj.CoreCompileInputs.cache
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.exe
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.pdb
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\Trail loading.gif
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.Form2.resources
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.Form3.resources
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\timer.gif
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\Newtonsoft.Json.dll
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\Newtonsoft.Json.xml
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\obj\Debug\Login_Ekranı.csproj.CopyComplete
+C:\Users\ceren\source\repos\Login_Ekranı\Login_Ekranı\bin\Debug\diller.json.txt
