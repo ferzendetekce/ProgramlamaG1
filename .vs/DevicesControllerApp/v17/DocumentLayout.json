@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\users\\feyz\\source\\repos\\programlamag11\\devicescontrollerapp\\kullanici\\userregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\kullanici\\userregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\users\\feyz\\source\\repos\\programlamag11\\devicescontrollerapp\\hasta kayit\\patientregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\hasta kayit\\patientregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
@@ -47,13 +47,13 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "UserRegistration.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Kullanici\\UserRegistration.cs",
-              "RelativeDocumentMoniker": "DevicesControllerApp\\Kullanici\\UserRegistration.cs",
-              "ToolTip": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Kullanici\\UserRegistration.cs [Design]",
-              "RelativeToolTip": "DevicesControllerApp\\Kullanici\\UserRegistration.cs [Design]",
+              "Title": "PatientRegistration.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs",
+              "ToolTip": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs [Design]",
+              "RelativeToolTip": "DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-21T11:41:47.992Z",
+              "WhenOpened": "2025-10-21T12:02:16.702Z",
               "EditorCaption": " [Design]"
             },
             {
@@ -65,7 +65,8 @@
               "ToolTip": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]",
               "RelativeToolTip": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-21T11:40:40.432Z"
+              "WhenOpened": "2025-10-21T11:40:40.432Z",
+              "EditorCaption": " [Design]"
             }
           ]
         }
