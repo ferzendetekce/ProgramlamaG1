@@ -23,7 +23,7 @@ namespace RehabilitationSystem.EngineAPI.Controllers
         {
             //kullaniciGirisDogrula fonk grup 1 e ihtiyac var
 
-            string userRole = null;
+            string? userRole = null;
             if (request.Username == "grup11" && request.Password == "12345")
                 userRole = "Operator";
             if (request.Username == "admin" && request.Password == "admin123")
@@ -33,7 +33,7 @@ namespace RehabilitationSystem.EngineAPI.Controllers
 
             if (userRole != null)
             {
-                var token = GenerateJwtToken(request.Username, userRole);
+                var token = GenerateJwtToken(request.Username ?? "", userRole);
                 Console.WriteLine($"Başarılı giriş: {request.Username}, Rol: {userRole}");
                 return Ok(new { status = "ok", token });
             }
@@ -46,8 +46,9 @@ namespace RehabilitationSystem.EngineAPI.Controllers
 
         private string GenerateJwtToken(string username, string role)
         {
+            var jwtKey = _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured");
             var securityKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])
+                Encoding.UTF8.GetBytes(jwtKey)
             );
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
