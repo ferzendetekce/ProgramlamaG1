@@ -40,3 +40,15 @@
 /Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/obj/Debug/net9.0/EngineAPI.genruntimeconfig.cache
 /Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/obj/Debug/net9.0/ref/EngineAPI.dll
 /Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/obj/Debug/net9.0/EngineAPI.sourcelink.json
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.csproj.AssemblyReference.cache
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.AssemblyInfoInputs.cache
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.AssemblyInfo.cs
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.csproj.CoreCompileInputs.cache
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.sourcelink.json
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.dll
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\refint\EngineAPI.dll
+C:\Users\wiser\Documents\ProgramlamaG3\ProgramlamaG2\DevicesControllerApp\Mobil\MobilUygulama\EngineAPI\obj\Debug\net9.0\EngineAPI.pdb

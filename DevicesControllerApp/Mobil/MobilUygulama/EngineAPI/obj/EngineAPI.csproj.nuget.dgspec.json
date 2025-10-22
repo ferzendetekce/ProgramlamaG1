@@ -1,26 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/EngineAPI.csproj": {}
+    "C:\\Users\\wiser\\Documents\\ProgramlamaG3\\ProgramlamaG2\\DevicesControllerApp\\Mobil\\MobilUygulama\\EngineAPI\\EngineAPI.csproj": {}
   },
   "projects": {
-    "/Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/EngineAPI.csproj": {
+    "C:\\Users\\wiser\\Documents\\ProgramlamaG3\\ProgramlamaG2\\DevicesControllerApp\\Mobil\\MobilUygulama\\EngineAPI\\EngineAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/EngineAPI.csproj",
+        "projectUniqueName": "C:\\Users\\wiser\\Documents\\ProgramlamaG3\\ProgramlamaG2\\DevicesControllerApp\\Mobil\\MobilUygulama\\EngineAPI\\EngineAPI.csproj",
         "projectName": "EngineAPI",
-        "projectPath": "/Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/EngineAPI.csproj",
-        "packagesPath": "/Users/cenkerusta/.nuget/packages/",
-        "outputPath": "/Users/cenkerusta/Desktop/ProgramlamaG1/DevicesControllerApp/Mobil/MobilUygulama/EngineAPI/obj/",
+        "projectPath": "C:\\Users\\wiser\\Documents\\ProgramlamaG3\\ProgramlamaG2\\DevicesControllerApp\\Mobil\\MobilUygulama\\EngineAPI\\EngineAPI.csproj",
+        "packagesPath": "C:\\Users\\wiser\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\wiser\\Documents\\ProgramlamaG3\\ProgramlamaG2\\DevicesControllerApp\\Mobil\\MobilUygulama\\EngineAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/cenkerusta/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\wiser\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "/usr/local/share/dotnet/library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -39,7 +40,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net9.0": {
@@ -77,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
