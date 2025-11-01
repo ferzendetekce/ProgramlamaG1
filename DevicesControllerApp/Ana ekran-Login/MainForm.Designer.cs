@@ -42,6 +42,7 @@
             this.btnPatient = new System.Windows.Forms.Button();
             this.btnTherapy = new System.Windows.Forms.Button();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -67,6 +68,7 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.BackColor = System.Drawing.Color.SandyBrown;
+            this.splitContainer1.Panel1.Controls.Add(this.button1);
             this.splitContainer1.Panel1.Controls.Add(this.button11);
             this.splitContainer1.Panel1.Controls.Add(this.button10);
             this.splitContainer1.Panel1.Controls.Add(this.button9);
@@ -210,6 +212,15 @@
             this.splitContainer2.SplitterDistance = 69;
             this.splitContainer2.TabIndex = 0;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 534);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(133, 40);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -247,6 +258,7 @@
         private System.Windows.Forms.Button btnUsers;
         private System.Windows.Forms.Button btnPatient;
         private System.Windows.Forms.Button btnTherapy;
+        private System.Windows.Forms.Button button1;
     }
 }
 
