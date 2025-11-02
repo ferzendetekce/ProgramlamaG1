@@ -34,22 +34,22 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.txt_Isim = new System.Windows.Forms.TextBox();
+            this.txt_Soyisim = new System.Windows.Forms.TextBox();
+            this.txt_TcNo = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
-            this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
+            this.dtBaslangic = new System.Windows.Forms.DateTimePicker();
+            this.dtBitis = new System.Windows.Forms.DateTimePicker();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.btn_rapor_al = new System.Windows.Forms.Button();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
-            this.btn_yazdir = new System.Windows.Forms.Button();
-            this.btn_mail = new System.Windows.Forms.Button();
+            this.btnRaporOlustur = new System.Windows.Forms.Button();
+            this.rbHastalariListele = new System.Windows.Forms.RadioButton();
+            this.rbSeanslarıListele = new System.Windows.Forms.RadioButton();
+            this.rbOperatorleriListele = new System.Windows.Forms.RadioButton();
+            this.rbLoglariListele = new System.Windows.Forms.RadioButton();
+            this.btnYazdir = new System.Windows.Forms.Button();
+            this.btnMail = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -61,9 +61,9 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.btn_mail);
-            this.panel1.Controls.Add(this.btn_yazdir);
-            this.panel1.Controls.Add(this.btn_rapor_al);
+            this.panel1.Controls.Add(this.btnMail);
+            this.panel1.Controls.Add(this.btnYazdir);
+            this.panel1.Controls.Add(this.btnRaporOlustur);
             this.panel1.Controls.Add(this.groupBox3);
             this.panel1.Controls.Add(this.groupBox2);
             this.panel1.Controls.Add(this.groupBox1);
@@ -84,9 +84,9 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.textBox3);
-            this.groupBox1.Controls.Add(this.textBox2);
-            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.txt_TcNo);
+            this.groupBox1.Controls.Add(this.txt_Soyisim);
+            this.groupBox1.Controls.Add(this.txt_Isim);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
@@ -100,7 +100,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(27, 46);
+            this.label1.Location = new System.Drawing.Point(19, 49);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(31, 16);
             this.label1.TabIndex = 0;
@@ -109,7 +109,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(27, 108);
+            this.label2.Location = new System.Drawing.Point(19, 101);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(55, 16);
             this.label2.TabIndex = 1;
@@ -119,37 +119,37 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(30, 159);
+            this.label3.Location = new System.Drawing.Point(19, 159);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(44, 16);
             this.label3.TabIndex = 2;
             this.label3.Text = "Tc No";
             // 
-            // textBox1
+            // txt_Isim
             // 
-            this.textBox1.Location = new System.Drawing.Point(149, 46);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 22);
-            this.textBox1.TabIndex = 3;
+            this.txt_Isim.Location = new System.Drawing.Point(149, 46);
+            this.txt_Isim.Name = "txt_Isim";
+            this.txt_Isim.Size = new System.Drawing.Size(100, 22);
+            this.txt_Isim.TabIndex = 3;
             // 
-            // textBox2
+            // txt_Soyisim
             // 
-            this.textBox2.Location = new System.Drawing.Point(149, 101);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 22);
-            this.textBox2.TabIndex = 4;
+            this.txt_Soyisim.Location = new System.Drawing.Point(149, 101);
+            this.txt_Soyisim.Name = "txt_Soyisim";
+            this.txt_Soyisim.Size = new System.Drawing.Size(100, 22);
+            this.txt_Soyisim.TabIndex = 4;
             // 
-            // textBox3
+            // txt_TcNo
             // 
-            this.textBox3.Location = new System.Drawing.Point(149, 159);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 22);
-            this.textBox3.TabIndex = 5;
+            this.txt_TcNo.Location = new System.Drawing.Point(149, 159);
+            this.txt_TcNo.Name = "txt_TcNo";
+            this.txt_TcNo.Size = new System.Drawing.Size(100, 22);
+            this.txt_TcNo.TabIndex = 5;
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.dateTimePicker2);
-            this.groupBox2.Controls.Add(this.dateTimePicker1);
+            this.groupBox2.Controls.Add(this.dtBitis);
+            this.groupBox2.Controls.Add(this.dtBaslangic);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Location = new System.Drawing.Point(48, 293);
@@ -177,26 +177,26 @@
             this.label5.TabIndex = 1;
             this.label5.Text = "Bitiş:";
             // 
-            // dateTimePicker1
+            // dtBaslangic
             // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(149, 68);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(200, 22);
-            this.dateTimePicker1.TabIndex = 2;
+            this.dtBaslangic.Location = new System.Drawing.Point(149, 68);
+            this.dtBaslangic.Name = "dtBaslangic";
+            this.dtBaslangic.Size = new System.Drawing.Size(200, 22);
+            this.dtBaslangic.TabIndex = 2;
             // 
-            // dateTimePicker2
+            // dtBitis
             // 
-            this.dateTimePicker2.Location = new System.Drawing.Point(149, 133);
-            this.dateTimePicker2.Name = "dateTimePicker2";
-            this.dateTimePicker2.Size = new System.Drawing.Size(200, 22);
-            this.dateTimePicker2.TabIndex = 3;
+            this.dtBitis.Location = new System.Drawing.Point(149, 133);
+            this.dtBitis.Name = "dtBitis";
+            this.dtBitis.Size = new System.Drawing.Size(200, 22);
+            this.dtBitis.TabIndex = 3;
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.radioButton4);
-            this.groupBox3.Controls.Add(this.radioButton3);
-            this.groupBox3.Controls.Add(this.radioButton2);
-            this.groupBox3.Controls.Add(this.radioButton1);
+            this.groupBox3.Controls.Add(this.rbLoglariListele);
+            this.groupBox3.Controls.Add(this.rbOperatorleriListele);
+            this.groupBox3.Controls.Add(this.rbSeanslarıListele);
+            this.groupBox3.Controls.Add(this.rbHastalariListele);
             this.groupBox3.Location = new System.Drawing.Point(48, 534);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(605, 232);
@@ -204,76 +204,76 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "groupBox3";
             // 
-            // btn_rapor_al
+            // btnRaporOlustur
             // 
-            this.btn_rapor_al.Location = new System.Drawing.Point(55, 787);
-            this.btn_rapor_al.Name = "btn_rapor_al";
-            this.btn_rapor_al.Size = new System.Drawing.Size(213, 59);
-            this.btn_rapor_al.TabIndex = 3;
-            this.btn_rapor_al.Text = "RAPOR AL";
-            this.btn_rapor_al.UseVisualStyleBackColor = true;
+            this.btnRaporOlustur.Location = new System.Drawing.Point(55, 787);
+            this.btnRaporOlustur.Name = "btnRaporOlustur";
+            this.btnRaporOlustur.Size = new System.Drawing.Size(213, 59);
+            this.btnRaporOlustur.TabIndex = 3;
+            this.btnRaporOlustur.Text = "RAPOR AL";
+            this.btnRaporOlustur.UseVisualStyleBackColor = true;
             // 
-            // radioButton1
+            // rbHastalariListele
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(7, 34);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(124, 20);
-            this.radioButton1.TabIndex = 0;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Hastaları Listele";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this.rbHastalariListele.AutoSize = true;
+            this.rbHastalariListele.Location = new System.Drawing.Point(7, 34);
+            this.rbHastalariListele.Name = "rbHastalariListele";
+            this.rbHastalariListele.Size = new System.Drawing.Size(124, 20);
+            this.rbHastalariListele.TabIndex = 0;
+            this.rbHastalariListele.TabStop = true;
+            this.rbHastalariListele.Text = "Hastaları Listele";
+            this.rbHastalariListele.UseVisualStyleBackColor = true;
             // 
-            // radioButton2
+            // rbSeanslarıListele
             // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(7, 84);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(127, 20);
-            this.radioButton2.TabIndex = 1;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "Seansları Listele";
-            this.radioButton2.UseVisualStyleBackColor = true;
+            this.rbSeanslarıListele.AutoSize = true;
+            this.rbSeanslarıListele.Location = new System.Drawing.Point(7, 78);
+            this.rbSeanslarıListele.Name = "rbSeanslarıListele";
+            this.rbSeanslarıListele.Size = new System.Drawing.Size(127, 20);
+            this.rbSeanslarıListele.TabIndex = 1;
+            this.rbSeanslarıListele.TabStop = true;
+            this.rbSeanslarıListele.Text = "Seansları Listele";
+            this.rbSeanslarıListele.UseVisualStyleBackColor = true;
             // 
-            // radioButton3
+            // rbOperatorleriListele
             // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(6, 128);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(141, 20);
-            this.radioButton3.TabIndex = 2;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Operatörleri Listele";
-            this.radioButton3.UseVisualStyleBackColor = true;
+            this.rbOperatorleriListele.AutoSize = true;
+            this.rbOperatorleriListele.Location = new System.Drawing.Point(7, 126);
+            this.rbOperatorleriListele.Name = "rbOperatorleriListele";
+            this.rbOperatorleriListele.Size = new System.Drawing.Size(141, 20);
+            this.rbOperatorleriListele.TabIndex = 2;
+            this.rbOperatorleriListele.TabStop = true;
+            this.rbOperatorleriListele.Text = "Operatörleri Listele";
+            this.rbOperatorleriListele.UseVisualStyleBackColor = true;
             // 
-            // radioButton4
+            // rbLoglariListele
             // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(7, 172);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(111, 20);
-            this.radioButton4.TabIndex = 3;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "Logları Listele";
-            this.radioButton4.UseVisualStyleBackColor = true;
+            this.rbLoglariListele.AutoSize = true;
+            this.rbLoglariListele.Location = new System.Drawing.Point(7, 168);
+            this.rbLoglariListele.Name = "rbLoglariListele";
+            this.rbLoglariListele.Size = new System.Drawing.Size(111, 20);
+            this.rbLoglariListele.TabIndex = 3;
+            this.rbLoglariListele.TabStop = true;
+            this.rbLoglariListele.Text = "Logları Listele";
+            this.rbLoglariListele.UseVisualStyleBackColor = true;
             // 
-            // btn_yazdir
+            // btnYazdir
             // 
-            this.btn_yazdir.Location = new System.Drawing.Point(284, 787);
-            this.btn_yazdir.Name = "btn_yazdir";
-            this.btn_yazdir.Size = new System.Drawing.Size(144, 62);
-            this.btn_yazdir.TabIndex = 4;
-            this.btn_yazdir.Text = "YAZDIR";
-            this.btn_yazdir.UseVisualStyleBackColor = true;
+            this.btnYazdir.Location = new System.Drawing.Point(284, 787);
+            this.btnYazdir.Name = "btnYazdir";
+            this.btnYazdir.Size = new System.Drawing.Size(144, 62);
+            this.btnYazdir.TabIndex = 4;
+            this.btnYazdir.Text = "YAZDIR";
+            this.btnYazdir.UseVisualStyleBackColor = true;
             // 
-            // btn_mail
+            // btnMail
             // 
-            this.btn_mail.Location = new System.Drawing.Point(445, 787);
-            this.btn_mail.Name = "btn_mail";
-            this.btn_mail.Size = new System.Drawing.Size(166, 62);
-            this.btn_mail.TabIndex = 5;
-            this.btn_mail.Text = "Mail Oluştur";
-            this.btn_mail.UseVisualStyleBackColor = true;
+            this.btnMail.Location = new System.Drawing.Point(445, 787);
+            this.btnMail.Name = "btnMail";
+            this.btnMail.Size = new System.Drawing.Size(166, 62);
+            this.btnMail.TabIndex = 5;
+            this.btnMail.Text = "Mail Oluştur";
+            this.btnMail.UseVisualStyleBackColor = true;
             // 
             // dataGridView1
             // 
@@ -315,22 +315,22 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btn_rapor_al;
+        private System.Windows.Forms.Button btnRaporOlustur;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.DateTimePicker dateTimePicker2;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.DateTimePicker dtBitis;
+        private System.Windows.Forms.DateTimePicker dtBaslangic;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button btn_mail;
-        private System.Windows.Forms.Button btn_yazdir;
-        private System.Windows.Forms.RadioButton radioButton4;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.TextBox txt_TcNo;
+        private System.Windows.Forms.TextBox txt_Soyisim;
+        private System.Windows.Forms.TextBox txt_Isim;
+        private System.Windows.Forms.Button btnMail;
+        private System.Windows.Forms.Button btnYazdir;
+        private System.Windows.Forms.RadioButton rbLoglariListele;
+        private System.Windows.Forms.RadioButton rbOperatorleriListele;
+        private System.Windows.Forms.RadioButton rbSeanslarıListele;
+        private System.Windows.Forms.RadioButton rbHastalariListele;
         private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
