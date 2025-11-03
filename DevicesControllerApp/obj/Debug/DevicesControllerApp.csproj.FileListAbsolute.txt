@@ -15,3 +15,21 @@ C:\Users\Feyz\Desktop\İleriProgramlama\KONTROL\Ana ekran-Login\DevicesControlle
 C:\Users\Feyz\Desktop\İleriProgramlama\KONTROL\Ana ekran-Login\DevicesControllerApp\DevicesControllerApp\obj\Debug\DevicesControllerApp.Terapi.Therapy.resources
 C:\Users\Feyz\Desktop\İleriProgramlama\KONTROL\Ana ekran-Login\DevicesControllerApp\DevicesControllerApp\obj\Debug\DevicesControllerApp.Veri_izleme.DataMonitoring.resources
 C:\Users\Feyz\Desktop\İleriProgramlama\KONTROL\Ana ekran-Login\DevicesControllerApp\DevicesControllerApp\obj\Debug\DevicesControllerApp.Kullanici.UserRegistration.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\bin\Debug\DevicesControllerApp.exe.config
+D:\Project\ProgramlamaG1\DevicesControllerApp\bin\Debug\DevicesControllerApp.exe
+D:\Project\ProgramlamaG1\DevicesControllerApp\bin\Debug\DevicesControllerApp.pdb
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.csproj.AssemblyReference.cache
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.exe.config
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.MainForm.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Ayarlar.Settings.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Hasta_kayit.PatientRegistration.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Kullanici.UserRegistration.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Properties.Resources.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Raporlama.Reports.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Servis.Service.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Terapi.Therapy.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Veri_izleme.DataMonitoring.resources
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.csproj.GenerateResource.cache
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.csproj.CoreCompileInputs.cache
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.exe
+D:\Project\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.pdb

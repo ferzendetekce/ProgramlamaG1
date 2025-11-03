@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +9,21 @@ namespace RehabilitationSystem.Communication
 {
     public class DeviceCommunication
     {
+        // ===== PROTOKOL SABİTLERİ =====
+        private const byte PACKET_START_BYTE = 0xAA;      // Paket başlangıç byte'ı
+        private const byte PACKET_END_BYTE = 0x55;        // Paket bitiş byte'ı
+        private const int MIN_PACKET_SIZE = 6;            // Minimum paket boyutu
+        private const int MAX_PACKET_SIZE = 256;          // Maximum paket boyutu
+        private const int MAX_RETRY_COUNT = 3;            // Maksimum tekrar deneme sayısı
+        private const int COMMAND_DELAY_MS = 50;          // Komutlar arası bekleme süresi
+
+
+        // Paket yapısı indeksleri
+        private const int INDEX_START = 0;
+        private const int INDEX_COMMAND = 1;
+        private const int INDEX_LENGTH = 2;
+        private const int INDEX_DATA = 3;
+
         private static DeviceCommunication _instance;
         private static readonly object _lock = new object();
 
@@ -55,7 +71,22 @@ namespace RehabilitationSystem.Communication
 
         private DeviceCommunication()
         {
-            // Başlangıç ayarları
+            // Komut kuyruğunu başlat
+            _commandQueue = new Queue<byte[]>();
+
+            // LoadCell buffer'ını başlat
+            _loadCellBuffer = new Queue<LoadCellDataPacket>();
+
+            // Başlangıç değerleri
+            IsConnected = false;
+            CurrentPort = string.Empty;
+            BaudRate = 9600;
+            CommandTimeout = 1000; // 1 saniye
+
+            // Serial port henüz null, OpenPort'ta oluşturulacak
+            _serialPort = null;
+            _readThread = null;
+            _isReading = false;
         }
 
         public bool OpenPort(string portName, int baudRate = 9600, Parity parity = Parity.None,
@@ -71,17 +102,46 @@ namespace RehabilitationSystem.Communication
 
         public string[] GetAvailablePorts()
         {
-            return null;
+            try
+            {
+                // Sistemdeki tüm COM portlarını al
+                return SerialPort.GetPortNames();
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda boş array döndür
+                HandleCommunicationError(ex, "GetAvailablePorts");
+                return new string[0];
+            }
         }
 
         public bool IsPortOpen()
         {
-            return false;
+            // Port nesnesi oluşturulmuş mu ve açık mı kontrol et
+            return _serialPort != null && _serialPort.IsOpen;
         }
 
         private void InitializePort()
         {
-            // Port başlangıç ayarları
+            if (_serialPort == null)
+                return;
+
+            // Timeout ayarları (milisaniye)
+            _serialPort.ReadTimeout = 500;    // 500ms okuma timeout
+            _serialPort.WriteTimeout = 500;   // 500ms yazma timeout
+
+            // Handshake yok (donanım kontrol yok)
+            _serialPort.Handshake = Handshake.None;
+
+            // Her byte geldiğinde event tetikle
+            _serialPort.ReceivedBytesThreshold = 1;
+
+            // Encoding (ASCII)
+            _serialPort.Encoding = Encoding.ASCII;
+
+            // Buffer boyutları
+            _serialPort.ReadBufferSize = 4096;
+            _serialPort.WriteBufferSize = 2048;
         }
 
         public ushort CalculateCRC16(byte[] data)

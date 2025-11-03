@@ -5,6 +5,7 @@ using DevicesControllerApp.Raporlama;
 using DevicesControllerApp.Servis;
 using DevicesControllerApp.Terapi;
 using DevicesControllerApp.Veri_izleme;
+using RehabilitationSystem.Communication;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -73,6 +74,28 @@ namespace DevicesControllerApp
             Therapy s = new Therapy();
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(s);
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            var device = DeviceCommunication.Instance;
+
+            // Port listesini al
+            string[] ports = device.GetAvailablePorts();
+
+            if (ports.Length == 0)
+            {
+                MessageBox.Show("Hiç COM port bulunamadı!", "Test", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                string portList = string.Join("\n", ports);
+                MessageBox.Show($"Bulunan portlar:\n{portList}", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            // Port durumunu kontrol et
+            bool isOpen = device.IsPortOpen();
+            MessageBox.Show($"Port durumu: {(isOpen ? "Açık" : "Kapalı")}", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
