@@ -76,7 +76,7 @@ namespace DevicesControllerApp
             splitContainer2.Panel2.Controls.Add(s);
         }
 
-        private void button11_Click(object sender, EventArgs e)
+        private void button9_Click(object sender, EventArgs e)
         {
             var device = DeviceCommunication.Instance;
 
@@ -96,6 +96,44 @@ namespace DevicesControllerApp
             // Port durumunu kontrol et
             bool isOpen = device.IsPortOpen();
             MessageBox.Show($"Port durumu: {(isOpen ? "Açık" : "Kapalı")}", "Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            var device = DeviceCommunication.Instance;
+
+            // Test verisi oluştur
+            byte[] testData = { 0x01, 0x02, 0x03, 0x04, 0x05 };
+
+            // CRC16 hesapla
+            ushort crc16 = device.CalculateCRC16(testData);
+
+            // Checksum hesapla
+            byte checksum = device.CalculateChecksum(testData);
+
+            // Sonuçları göster
+            string result = $"Test Verisi: 01 02 03 04 05\n\n";
+            result += $"CRC16: 0x{crc16:X4} (Decimal: {crc16})\n";
+            result += $"Checksum: 0x{checksum:X2} (Decimal: {checksum})\n\n";
+
+            // Doğrulama testi
+            bool crcValid = device.VerifyCRC16(testData, crc16);
+            bool checksumValid = device.VerifyChecksum(testData, checksum);
+
+            result += $"CRC16 Doğrulama: {(crcValid ? "✓ BAŞARILI" : "✗ HATALI")}\n";
+            result += $"Checksum Doğrulama: {(checksumValid ? "✓ BAŞARILI" : "✗ HATALI")}";
+
+            MessageBox.Show(result, "CRC Test Sonucu", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // Yanlış CRC ile test
+            bool wrongCrcTest = device.VerifyCRC16(testData, 0x0000);
+            MessageBox.Show($"Yanlış CRC ile test: {(wrongCrcTest ? "HATALI!" : "Doğru çalışıyor ✓")}",
+                            "Negatif Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }

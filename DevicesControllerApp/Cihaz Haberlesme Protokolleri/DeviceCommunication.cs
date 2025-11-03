@@ -146,22 +146,80 @@ namespace RehabilitationSystem.Communication
 
         public ushort CalculateCRC16(byte[] data)
         {
-            return 0;
+            // data null veya boş mu kontrol et
+            if (data == null || data.Length == 0)
+                return 0;
+
+            // CRC başlangıç değeri (MODBUS standardı)
+            ushort crc = 0xFFFF;
+
+            // Her byte için işlem yap
+            foreach (byte b in data)
+            {
+                // CRC ile byte'ı XOR'la
+                crc ^= b;
+
+                // 8 bit için kaydırma işlemi
+                for (int i = 0; i < 8; i++)
+                {
+                    // Son bit 1 mi kontrol et
+                    if ((crc & 0x0001) != 0)
+                    {
+                        // Sağa kaydır ve polynomial ile XOR'la
+                        crc = (ushort)((crc >> 1) ^ 0xA001);
+                    }
+                    else
+                    {
+                        // Sadece sağa kaydır
+                        crc >>= 1;
+                    }
+                }
+            }
+
+            return crc;
         }
 
         public byte CalculateChecksum(byte[] data)
         {
-            return 0;
+            // data null veya boş mu kontrol et
+            if (data == null || data.Length == 0)
+                return 0;
+
+            // Tüm byte'ları topla
+            int sum = 0;
+            foreach (byte b in data)
+            {
+                sum += b;
+            }
+
+            // Mod 256 al (sadece son 8 bit)
+            return (byte)(sum & 0xFF);
         }
 
         public bool VerifyCRC16(byte[] data, ushort receivedCrc)
         {
-            return false;
+            // data null mu kontrol et
+            if (data == null || data.Length == 0)
+                return false;
+
+            // Gelen veri için CRC hesapla
+            ushort calculatedCrc = CalculateCRC16(data);
+
+            // Hesaplanan CRC ile gelen CRC'yi karşılaştır
+            return calculatedCrc == receivedCrc;
         }
 
         public bool VerifyChecksum(byte[] data, byte receivedChecksum)
         {
-            return false;
+            // data null mu kontrol et
+            if (data == null || data.Length == 0)
+                return false;
+
+            // Gelen veri için checksum hesapla
+            byte calculatedChecksum = CalculateChecksum(data);
+
+            // Hesaplanan checksum ile gelen checksum'ı karşılaştır
+            return calculatedChecksum == receivedChecksum;
         }
 
         public bool SendCommand(byte commandCode, byte[] data = null)
@@ -434,22 +492,34 @@ namespace RehabilitationSystem.Communication
 
         private byte[] ConvertDoubleToBytes(double value)
         {
-            return null;
+            // Double'ı 8 byte'a çevir
+            return BitConverter.GetBytes(value);
         }
 
         private double ConvertBytesToDouble(byte[] bytes)
         {
-            return 0.0;
+            // Null ve boyut kontrolü
+            if (bytes == null || bytes.Length < 8)
+                return 0.0;
+
+            // 8 byte'ı double'a çevir
+            return BitConverter.ToDouble(bytes, 0);
         }
 
         private int ConvertBytesToInt(byte[] bytes)
         {
-            return 0;
+            // Null ve boyut kontrolü
+            if (bytes == null || bytes.Length < 4)
+                return 0;
+
+            // 4 byte'ı int'e çevir
+            return BitConverter.ToInt32(bytes, 0);
         }
 
         private byte[] ConvertIntToBytes(int value)
         {
-            return null;
+            // Int'i 4 byte'a çevir
+            return BitConverter.GetBytes(value);
         }
 
         private void LogCommunication(string message, bool isError = false)
