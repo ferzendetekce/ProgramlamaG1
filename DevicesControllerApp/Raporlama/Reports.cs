@@ -21,5 +21,19 @@ namespace DevicesControllerApp.Raporlama
         {
 
         }
+
+        private void btnRaporOlustur_Click(object sender, EventArgs e)
+        {
+            string isim = txt_Isim.Text.Trim();
+            string soyisim = txt_Soyisim.Text.Trim();
+            string tc = txt_TcNo.Text.Trim();
+
+            DateTime baslangicTarihi = dtBaslangic.Value.Date;
+            DateTime bitisTarihi = dtBitis.Value.Date.AddDays(1).AddSeconds(-1);
+
+
+            
+
+        }
     }
 }
