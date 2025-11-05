@@ -36,7 +36,7 @@ namespace DevicesControllerApp.Hasta_kayit
 
         private void button1_Click(object sender, EventArgs e)
         {
-              db.HastaSil(long.Parse(textBox2.Text));
+            db.HastaSil(long.Parse(textBox2.Text));
         }
     }
 }
