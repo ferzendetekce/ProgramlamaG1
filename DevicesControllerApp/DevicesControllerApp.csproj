@@ -93,6 +93,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.IO.Ports" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ana ekran-Login\Login.cs">
