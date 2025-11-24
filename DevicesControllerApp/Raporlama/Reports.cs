@@ -32,8 +32,57 @@ namespace DevicesControllerApp.Raporlama
             DateTime bitisTarihi = dtBitis.Value.Date.AddDays(1).AddSeconds(-1);
 
 
-            
+            if(rbHastalariListele.Checked)
+            {
+                HastalariListele(isim, soyisim, tc, baslangicTarihi, bitisTarihi);
+
+            }
+
+            else if (rbSeanslarıListele.Checked)
+            {
+                SeanslariListele(isim, soyisim, tc, baslangicTarihi, bitisTarihi);
+
+            }
+
+            else if(rbOperatorleriListele.Checked)
+            {
+                OperatorListele(isim, soyisim, tc, baslangicTarihi, bitisTarihi);
+            }
+
+            else if(rbLoglariListele.Checked)
+            {
+                LoglariListele(isim, soyisim, tc, baslangicTarihi, bitisTarihi);
+
+            }
+
+            else
+            {
+                MessageBox.Show("Lütfen rapor türü seçiniz!");
+            }
 
         }
+
+        private void HastalariListele(string isim,string soyisim,string tc,DateTime baslangicTarihi,DateTime bitisTarihi)
+        {
+           
+
+
+        }
+
+        private void SeanslariListele(string isim, string soyisim, string tc, DateTime baslangicTarihi, DateTime bitisTarihi)
+        {
+
+        }
+
+        private void OperatorListele(string isim, string soyisim, string tc, DateTime baslangicTarihi, DateTime bitisTarihi)
+        {
+
+        }
+
+        private void LoglariListele(string isim, string soyisim, string tc, DateTime baslangicTarihi, DateTime bitisTarihi)
+        {
+
+        }
+
     }
 }
