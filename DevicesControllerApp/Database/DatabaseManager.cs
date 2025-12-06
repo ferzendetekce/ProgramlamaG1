@@ -11,7 +11,22 @@ namespace DevicesControllerApp.Database
 
     internal class DatabaseManager
     {
-   
+
+        private static DatabaseManager _instance;
+
+        public static DatabaseManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = new DatabaseManager();
+
+                return _instance;
+            }
+        }
+
+
+
         private DatabaseManager()
         {
             // Connection string yükleme
@@ -293,6 +308,57 @@ namespace DevicesControllerApp.Database
         {
             // Hata loglama
         }
+
+        public DataTable GetPatientSessionsByTc(string tc)
+        {
+            DataTable dt = new DataTable();
+
+            string query = @"
+        SELECT
+            h.tc_kimlik_no AS ""TC Kimlik No"",
+            h.ad || ' ' || h.soyad AS ""Hasta Adı"",
+            s.seans_id AS ""Seans ID"",
+            s.seans_tarihi_baslangic AS ""Seans Başlangıç"",
+            s.seans_suresi_dk AS ""Süre (dk)"",
+            s.yurume_hizi_km_s AS ""Yürüme Hızı"",
+            s.vucut_agirlik_destegi_yuzde AS ""Ağırlık Desteği"",
+            s.yurunen_mesafe_m AS ""Mesafe (m)"",
+            s.zorluk_seviyesi AS ""Zorluk"",
+            s.ortalama_kalp_atisi_bpm AS ""Ortalama Nabız"",
+            s.notlar AS ""Notlar""
+        FROM hastalar h
+        INNER JOIN seanslar s 
+            ON h.tc_kimlik_no = s.hasta_tc
+        WHERE h.tc_kimlik_no = @tc
+        ORDER BY s.seans_tarihi_baslangic DESC;
+    ";
+
+            try
+            {
+                using (var conn = new Npgsql.NpgsqlConnection(
+                    "Host=localhost;Port=5432;Database=lokomatDB;Username=postgres;Password=1234;"))
+                {
+                    conn.Open();
+
+                    using (var cmd = new Npgsql.NpgsqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@tc", tc);
+
+                        using (var da = new Npgsql.NpgsqlDataAdapter(cmd))
+                        {
+                            da.Fill(dt);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return dt;
+        }
+
 
     }
     // LoadCell verisi için model class
