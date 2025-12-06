@@ -51,6 +51,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.button1 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -61,6 +62,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.btnMail);
             this.panel1.Controls.Add(this.btnYazdir);
             this.panel1.Controls.Add(this.btnRaporOlustur);
@@ -70,32 +72,32 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(700, 868);
+            this.panel1.Size = new System.Drawing.Size(649, 868);
             this.panel1.TabIndex = 0;
             // 
             // btnMail
             // 
-            this.btnMail.Location = new System.Drawing.Point(445, 787);
+            this.btnMail.Location = new System.Drawing.Point(164, 716);
             this.btnMail.Name = "btnMail";
-            this.btnMail.Size = new System.Drawing.Size(166, 62);
+            this.btnMail.Size = new System.Drawing.Size(119, 40);
             this.btnMail.TabIndex = 5;
             this.btnMail.Text = "Mail Oluştur";
             this.btnMail.UseVisualStyleBackColor = true;
             // 
             // btnYazdir
             // 
-            this.btnYazdir.Location = new System.Drawing.Point(284, 787);
+            this.btnYazdir.Location = new System.Drawing.Point(15, 762);
             this.btnYazdir.Name = "btnYazdir";
-            this.btnYazdir.Size = new System.Drawing.Size(144, 62);
+            this.btnYazdir.Size = new System.Drawing.Size(130, 38);
             this.btnYazdir.TabIndex = 4;
             this.btnYazdir.Text = "YAZDIR";
             this.btnYazdir.UseVisualStyleBackColor = true;
             // 
             // btnRaporOlustur
             // 
-            this.btnRaporOlustur.Location = new System.Drawing.Point(55, 787);
+            this.btnRaporOlustur.Location = new System.Drawing.Point(15, 716);
             this.btnRaporOlustur.Name = "btnRaporOlustur";
-            this.btnRaporOlustur.Size = new System.Drawing.Size(213, 59);
+            this.btnRaporOlustur.Size = new System.Drawing.Size(134, 40);
             this.btnRaporOlustur.TabIndex = 3;
             this.btnRaporOlustur.Text = "RAPOR AL";
             this.btnRaporOlustur.UseVisualStyleBackColor = true;
@@ -107,7 +109,7 @@
             this.groupBox3.Controls.Add(this.rbOperatorleriListele);
             this.groupBox3.Controls.Add(this.rbSeanslarıListele);
             this.groupBox3.Controls.Add(this.rbHastalariListele);
-            this.groupBox3.Location = new System.Drawing.Point(48, 534);
+            this.groupBox3.Location = new System.Drawing.Point(15, 469);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(605, 232);
             this.groupBox3.TabIndex = 2;
@@ -164,7 +166,7 @@
             this.groupBox2.Controls.Add(this.dtBaslangic);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Location = new System.Drawing.Point(48, 293);
+            this.groupBox2.Location = new System.Drawing.Point(15, 233);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(605, 217);
             this.groupBox2.TabIndex = 1;
@@ -211,7 +213,7 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(48, 53);
+            this.groupBox1.Location = new System.Drawing.Point(15, 3);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(605, 214);
             this.groupBox1.TabIndex = 0;
@@ -271,20 +273,29 @@
             // 
             this.panel2.Controls.Add(this.dataGridView1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(700, 0);
+            this.panel2.Location = new System.Drawing.Point(649, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1091, 868);
+            this.panel2.Size = new System.Drawing.Size(1142, 868);
             this.panel2.TabIndex = 1;
             // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(27, 27);
+            this.dataGridView1.Location = new System.Drawing.Point(6, 27);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(817, 819);
+            this.dataGridView1.Size = new System.Drawing.Size(1016, 773);
             this.dataGridView1.TabIndex = 0;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(164, 762);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(119, 38);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "PDF Oluştur";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // Reports
             // 
@@ -333,5 +344,6 @@
         private System.Windows.Forms.RadioButton rbSeanslarıListele;
         private System.Windows.Forms.RadioButton rbHastalariListele;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button button1;
     }
 }

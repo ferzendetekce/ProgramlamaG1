@@ -92,7 +92,7 @@
             // 
             // button11
             // 
-            this.button11.Location = new System.Drawing.Point(16, 663);
+            this.button11.Location = new System.Drawing.Point(16, 641);
             this.button11.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(177, 49);
@@ -102,7 +102,7 @@
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(16, 596);
+            this.button10.Location = new System.Drawing.Point(16, 575);
             this.button10.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(177, 49);
@@ -112,7 +112,7 @@
             // 
             // button9
             // 
-            this.button9.Location = new System.Drawing.Point(16, 539);
+            this.button9.Location = new System.Drawing.Point(16, 518);
             this.button9.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(177, 49);
@@ -122,7 +122,7 @@
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(16, 482);
+            this.button8.Location = new System.Drawing.Point(16, 461);
             this.button8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(177, 49);
@@ -132,7 +132,7 @@
             // 
             // btnSettings
             // 
-            this.btnSettings.Location = new System.Drawing.Point(16, 425);
+            this.btnSettings.Location = new System.Drawing.Point(16, 404);
             this.btnSettings.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(177, 49);
@@ -143,7 +143,7 @@
             // 
             // btnService
             // 
-            this.btnService.Location = new System.Drawing.Point(16, 357);
+            this.btnService.Location = new System.Drawing.Point(16, 347);
             this.btnService.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnService.Name = "btnService";
             this.btnService.Size = new System.Drawing.Size(177, 49);

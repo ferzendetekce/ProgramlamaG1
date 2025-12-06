@@ -3,15 +3,15 @@
   "WorkspaceRootPath": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\users\\erold\\source\\repos\\programlamag1new\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\users\\erold\\source\\repos\\programlamag1new\\devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\users\\erold\\source\\repos\\programlamag1new\\devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -22,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,7 +34,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "MainForm.cs [Design]",
               "DocumentMoniker": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
@@ -50,8 +50,8 @@
               "Title": "Reports.cs",
               "DocumentMoniker": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\DevicesControllerApp\\Raporlama\\Reports.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Raporlama\\Reports.cs",
-              "ToolTip": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\DevicesControllerApp\\Raporlama\\Reports.cs",
-              "RelativeToolTip": "DevicesControllerApp\\Raporlama\\Reports.cs",
+              "ToolTip": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\DevicesControllerApp\\Raporlama\\Reports.cs*",
+              "RelativeToolTip": "DevicesControllerApp\\Raporlama\\Reports.cs*",
               "ViewState": "AgIAACQAAAAAAAAAAAAAAEkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-25T11:19:16.759Z",
@@ -59,12 +59,12 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Reports.cs [Design]",
               "DocumentMoniker": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\DevicesControllerApp\\Raporlama\\Reports.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Raporlama\\Reports.cs",
-              "ToolTip": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\DevicesControllerApp\\Raporlama\\Reports.cs [Design]",
-              "RelativeToolTip": "DevicesControllerApp\\Raporlama\\Reports.cs [Design]",
+              "ToolTip": "C:\\Users\\erold\\source\\repos\\ProgramlamaG1new\\DevicesControllerApp\\Raporlama\\Reports.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Raporlama\\Reports.cs [Design]*",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-25T11:18:07.028Z",
               "EditorCaption": " [Design]"
