@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
 using Npgsql;
 
 namespace DevicesControllerApp.Raporlama
@@ -120,6 +123,63 @@ namespace DevicesControllerApp.Raporlama
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            {
+                if (dataGridView1.Rows.Count == 0)
+                {
+                    MessageBox.Show("PDF oluşturmak için listelenmiş veri yok.");
+                    return;
+                }
 
+                SaveFileDialog save = new SaveFileDialog();
+                save.Filter = "PDF Dosyası|*.pdf";
+                save.Title = "PDF Kaydet";
+
+                if (save.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        Document doc = new Document(PageSize.A4.Rotate());
+                        PdfWriter.GetInstance(doc, new FileStream(save.FileName, FileMode.Create));
+                        doc.Open();
+
+                        PdfPTable pdfTable = new PdfPTable(dataGridView1.Columns.Count);
+                        pdfTable.WidthPercentage = 100;
+
+                        // Başlıklar
+                        foreach (DataGridViewColumn column in dataGridView1.Columns)
+                        {
+                            PdfPCell cell = new PdfPCell(new Phrase(column.HeaderText));
+                            cell.BackgroundColor = BaseColor.LIGHT_GRAY;
+                            pdfTable.AddCell(cell);
+                        }
+
+                        // Satırlar
+                        foreach (DataGridViewRow row in dataGridView1.Rows)
+                        {
+                            if (row.IsNewRow) continue;
+
+                            foreach (DataGridViewCell cell in row.Cells)
+                            {
+                                pdfTable.AddCell(cell.Value?.ToString() ?? "");
+                            }
+                        }
+
+                        doc.Add(new Paragraph("Hasta Seans Raporu"));
+                        doc.Add(new Paragraph(" "));
+                        doc.Add(pdfTable);
+
+                        doc.Close();
+
+                        MessageBox.Show(" PDF başarıyla oluşturuldu.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(" PDF oluşturulurken hata oluştu:\n" + ex.Message);
+                    }
+                }
+            }
+        }
     }
 }
