@@ -361,5 +361,51 @@ namespace DevicesControllerApp
             LogToScreen($"TAM PAKET (Hercules'e yapıştır):");
             LogToScreen(hexPacket);
         }
+       
+
+        private void button11_Click_1(object sender, EventArgs e)
+        {
+            LogToScreen("=== PORT KAPATMA ===");
+
+            if (!DeviceCommunication.Instance.IsConnected)
+            {
+                LogToScreen("Kapatılacak açık port yok!");
+                MessageBox.Show("Zaten hiçbir port açık değil.",
+                    "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string currentPort = DeviceCommunication.Instance.CurrentPort;
+
+            // Onay al
+            DialogResult result = MessageBox.Show(
+                $"{currentPort} portunu kapatmak istediğinizden emin misiniz?",
+                "Port Kapatma Onayı",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                LogToScreen($"{currentPort} portu kapatılıyor...");
+
+                bool closeResult = DeviceCommunication.Instance.ClosePort();
+
+                if (closeResult)
+                {
+                    LogToScreen($"✓ {currentPort} portu başarıyla kapatıldı!");
+                    MessageBox.Show($"{currentPort} portu kapatıldı.",
+                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    LogToScreen($"✗ Port kapatma hatası!");
+                }
+            }
+            else
+            {
+                LogToScreen("Port kapatma işlemi iptal edildi.");
+            }
+        }
     }
-}
+ }
+
