@@ -502,3 +502,6 @@ namespace RehabilitationSystem.Communication
 
     #endregion
 }
+#pragma warning restore 649, 169, 414, 67
+// Uyarılar: Şu an stub olan alanlar/olaylar için kullanılmama uyarılarını bastırıyoruz.
+#pragma warning disable 649, 169, 414, 67

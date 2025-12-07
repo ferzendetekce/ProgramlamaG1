@@ -316,17 +316,17 @@ namespace RehabilitationSystem.Mobile
     {
         private readonly CultureInfo _culture = CultureInfo.InvariantCulture;
 
-        public string PatientName { get; private set; } = "Mobil Hasta";
-        public bool IsRunning { get; private set; }
-        public bool IsPaused { get; private set; }
-        public bool IsEmergency { get; private set; }
-        public DateTime? StartedAt { get; private set; }
-        public DateTime? LastUpdate { get; private set; }
-        public int TargetDurationMinutes { get; private set; } = 30;
-        public double WeightSupport { get; private set; } = 20;
-        public int ShoeSize { get; private set; } = 42;
-        public double SupportBarHeight { get; private set; } = 0.4;
-        public string LastCommand { get; private set; } = "hazır";
+        public string PatientName { get; set; } = "Mobil Hasta";
+        public bool IsRunning { get; set; }
+        public bool IsPaused { get; set; }
+        public bool IsEmergency { get; set; }
+        public DateTime? StartedAt { get; set; }
+        public DateTime? LastUpdate { get; set; }
+        public int TargetDurationMinutes { get; set; } = 30;
+        public double WeightSupport { get; set; } = 20;
+        public int ShoeSize { get; set; } = 42;
+        public double SupportBarHeight { get; set; } = 0.4;
+        public string LastCommand { get; set; } = "hazir";
 
         public void Start()
         {
@@ -448,7 +448,10 @@ namespace RehabilitationSystem.Mobile
                 return "Devam ediyor";
             }
 
-            return "Hazır";
+            return "hazir";
         }
     }
 }
+
+
+

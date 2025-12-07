@@ -1,25 +1,32 @@
-import { View, Text, ActivityIndicator, Alert } from 'react-native'
+import { View, Text, ActivityIndicator, Alert, StyleSheet, Animated, Easing } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react';
 import PInput from '../components/PInput';
 import PButton from '../components/PButton';
 import statusService from '../services/statusService';
 
-/**
- * Kullanıcının backend servisinin IP ve Port bilgilerini girdiği ekran.
- */
 const Connect = ({ navigation }) => {
-  const [ip, setIp] = useState("172.20.10.2");
+  const [ip, setIp] = useState("10.200.117.50");
   const [port, setPort] = useState("5086");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState('');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   const handleConnect = async () => {
     setError('');
     setChecking(true);
     try {
       await statusService.checkConnection(ip, port);
-      await AsyncStorage.setItem("apiHost", JSON.stringify( {ip, port} ));
+      await AsyncStorage.setItem("apiHost", JSON.stringify({ ip, port }));
       navigation.navigate("Login");
     } catch (err) {
       console.error("Bağlantı doğrulanamadı:", err);
@@ -28,32 +35,88 @@ const Connect = ({ navigation }) => {
     } finally {
       setChecking(false);
     }
-  }
+  };
+
+  const handleAutoDiscover = async () => {
+    setError('');
+    setChecking(true);
+    try {
+      const found = await statusService.autoDiscover();
+      setIp(found.ip);
+      setPort(String(found.port));
+      await AsyncStorage.setItem("apiHost", JSON.stringify(found));
+      Alert.alert("Bulundu", `Sunucu: ${found.ip}:${found.port}`);
+      navigation.navigate("Login");
+    } catch (err) {
+      console.error("Otomatik keşif başarısız:", err);
+      setError(err.message || "Sunucu bulunamadı.");
+    } finally {
+      setChecking(false);
+    }
+  };
 
   return (
-    <View className='flex-1 items-center justify-center bg-slate-200 p-5'>
-      <Text className="text-3xl font-bold text-gray-800 mb-8 text-center">Cihaza Bağlan</Text>
-      <View className='w-full max-w-sm'>
+    <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0,1], outputRange: [20,0] }) }] }]}>
+      <Text style={styles.title}>Cihaza Bağlan</Text>
+      <View style={styles.card}>
         <PInput
           value={ip}
           onChangeText={setIp}
           placeholder='IP Adresi'
           className="mb-4"
-          />
+        />
         <PInput
           value={port}
           onChangeText={setPort}
           placeholder='Port Numarası'
           keyboardType='numeric'
           className="mb-6"
-          />
-        {error ? <Text className="text-center text-red-600 mb-4">{error}</Text> : null}
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
         <PButton onPress={handleConnect} disabled={checking}>
           {checking ? <ActivityIndicator color="white" /> : "İlerle"}
         </PButton>
+        <View style={{ height: 12 }} />
+        <PButton onPress={handleAutoDiscover} disabled={checking}>
+          {checking ? <ActivityIndicator color="white" /> : "Otomatik Bul"}
+        </PButton>
       </View>
-    </View>
-  )
-}
+    </Animated.View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#E8ECF4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginBottom: 16
+  },
+  card: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: '#FFFFFF',
+    padding: 18,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    elevation: 4
+  },
+  error: {
+    textAlign: 'center',
+    color: '#DC2626',
+    marginBottom: 12,
+    fontWeight: '600'
+  }
+});
 
 export default Connect;

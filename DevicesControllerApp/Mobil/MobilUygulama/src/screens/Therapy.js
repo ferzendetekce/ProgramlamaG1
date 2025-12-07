@@ -1,17 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ControlSection from '../components/ControlSection';
 import PButton from '../components/PButton';
 import statusService from '../services/statusService';
 
-/**
- * Aktif terapi bilgilerinin görüntülendiği ekran.
- */
 const Therapy = ({ navigation }) => {
   const [therapyData, setTherapyData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const loadTherapy = useCallback(async () => {
     setLoading(true);
@@ -36,6 +34,15 @@ const Therapy = ({ navigation }) => {
     return () => clearInterval(intervalId);
   }, [loadTherapy]);
 
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 450,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
   const formatElapsed = () => {
     if (!therapyData?.startedAt || !therapyData?.lastUpdate) return "00:00";
     const start = new Date(therapyData.startedAt);
@@ -53,49 +60,121 @@ const Therapy = ({ navigation }) => {
     return `${pad(total)}:00`;
   };
 
+  const progressPercent = () => {
+    if (!therapyData?.startedAt || !therapyData?.lastUpdate || !therapyData?.targetDurationMinutes) return 0;
+    const start = new Date(therapyData.startedAt);
+    const last = new Date(therapyData.lastUpdate);
+    const diffMs = Math.max(0, last.getTime() - start.getTime());
+    const targetMs = therapyData.targetDurationMinutes * 60000;
+    return Math.min(100, Math.round((diffMs / targetMs) * 100));
+  };
+
   const statusColor = therapyData?.isEmergency
-    ? "text-red-600"
+    ? "#DC2626"
     : therapyData?.isRunning
-      ? "text-green-600"
-      : "text-gray-800";
+      ? "#16A34A"
+      : "#111827";
 
   return (
-    <View className="flex-1 bg-gray-50 items-center justify-center p-5">
+    <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0,1], outputRange: [16,0] }) }] }]}>
       <ControlSection title="Aktif Terapi Bilgileri">
-        <Ionicons name="body-outline" size={56} color="#5D3FD3" className="mb-4"/>
-        <View className="w-full">
-          {error ? (
-            <Text className="text-center text-red-600 mb-3">{error}</Text>
-          ) : null}
-
-          {loading ? (
-            <ActivityIndicator size="large" color="#5D3FD3" />
-          ) : (
-            <>
-              <InfoRow label="Hasta Adı:" value={therapyData?.patientName || 'Bilinmiyor'} />
-              <InfoRow label="Geçen Süre:" value={`${formatElapsed()} / ${formatTotal()}`} />
-              <InfoRow label="Ağırlık Azaltma:" value={`${Math.round(therapyData?.weightSupport || 0)} kg`} />
-              <InfoRow label="Ayak Numarası:" value={therapyData?.shoeSize || '-'} />
-              <InfoRow label="Destek Barı:" value={`${therapyData?.supportBarHeight ?? 0} m`} />
-              <InfoRow label="Durum:" value={therapyData?.statusText || 'Hazır'} valueColor={statusColor} />
-            </>
-          )}
+        <View style={styles.headerRow}>
+          <Ionicons name="body-outline" size={56} color="#5D3FD3" />
+          <View>
+            <Text style={styles.name}>{therapyData?.patientName || 'Bilinmiyor'}</Text>
+            <Text style={[styles.status, { color: statusColor }]}>{therapyData?.statusText || 'Hazır'}</Text>
+          </View>
         </View>
 
-        <View className="w-full mt-4">
+        {error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : null}
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#5D3FD3" />
+        ) : (
+          <>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Geçen Süre</Text>
+              <Text style={styles.value}>{`${formatElapsed()} / ${formatTotal()}`}</Text>
+            </View>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progressPercent()}%` }]} />
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Ağırlık Azaltma</Text>
+              <Text style={styles.value}>{`${Math.round(therapyData?.weightSupport || 0)} kg`}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Ayak Numarası</Text>
+              <Text style={styles.value}>{therapyData?.shoeSize || '-'}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Destek Barı</Text>
+              <Text style={styles.value}>{`${therapyData?.supportBarHeight ?? 0} m`}</Text>
+            </View>
+          </>
+        )}
+
+        <View style={{ marginTop: 12 }}>
           <PButton onPress={loadTherapy} disabled={loading}>Yenile</PButton>
         </View>
       </ControlSection>
-    </View>
+    </Animated.View>
   );
 };
 
-// Bilgi satırlarını göstermek için yardımcı bir bileşen.
-const InfoRow = ({ label, value, valueColor = 'text-gray-800' }) => (
-    <View className="flex-row justify-between mb-4 pb-2 border-b border-gray-200">
-        <Text className="text-lg text-gray-500">{label}</Text>
-        <Text className={`text-lg font-semibold ${valueColor}`}>{value}</Text>
-    </View>
-);
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#EEF2F7',
+    padding: 16
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    marginLeft: 12
+  },
+  status: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 12
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10
+  },
+  label: {
+    fontSize: 16,
+    color: '#6B7280'
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827'
+  },
+  progressTrack: {
+    height: 12,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 12,
+    overflow: 'hidden'
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#5D3FD3'
+  },
+  errorText: {
+    color: '#DC2626',
+    marginBottom: 8
+  }
+});
 
 export default Therapy;

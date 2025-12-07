@@ -1,11 +1,9 @@
-import { ScrollView, View, Text, Alert } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { ScrollView, View, Text, Alert, StyleSheet, Animated, Easing } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import remoteService from '../services/remoteService';
 import ControlButton from '../components/ControlButton';
 import ControlSection from '../components/ControlSection';
-
-// Güncellenmiş bildirim fonksiyonlarını import ediyoruz
 import {
   sendImmediateNotification,
   sendErrorNotification,
@@ -15,6 +13,8 @@ import {
 const Remote = ({ navigation }) => {
   const [host, setHost] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [errorText, setErrorText] = useState('');
 
   useEffect(() => {
     const loadHost = async () => {
@@ -28,7 +28,15 @@ const Remote = ({ navigation }) => {
     loadHost();
   }, [navigation]);
 
-  // Backend'e komut gönderen ve bildirim yollayan merkezi fonksiyon.
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 450,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
   const sendCommandWithNotification = async (command, notificationTitle, notificationBody) => {
     if (!host) {
       Alert.alert("Hata", "Sunucu bağlantı bilgileri bulunamadı.");
@@ -36,15 +44,16 @@ const Remote = ({ navigation }) => {
     }
     try {
       await remoteService.remoteService(host.ip, host.port, command);
-      // Komut başarılı olursa bildirimi gönder
       sendImmediateNotification(notificationTitle, notificationBody);
+      setErrorText('');
     } catch (error) {
       console.error(`'${command}' komutu gönderilirken hata:`, error);
       sendErrorNotification('Cihaza komut gönderilemedi.');
+      setErrorText(error.message || 'Bilinmeyen hata');
       if (error.status === 401) {
         Alert.alert(
           "Oturum Hatası",
-          "Oturumunuzun süresi dolmuş. Lütfen tekrar giriş yapın.",
+          "Oturumunuzun süresi dolmuş olabilir. Lütfen tekrar giriş yapın.",
           [{ text: "Tamam", onPress: () => navigation.replace('Login') }]
         );
       } else {
@@ -64,10 +73,15 @@ const Remote = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }} className="bg-gray-50 p-5 pt-12">
+    <Animated.ScrollView contentContainerStyle={styles.container} style={{ opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0,1], outputRange: [16,0] }) }] }}>
+      <View style={styles.hostCard}>
+        <Text style={styles.hostTitle}>Sunucu</Text>
+        <Text style={styles.hostValue}>{host ? `${host.ip}:${host.port}` : "Bağlı değil"}</Text>
+      </View>
 
       <ControlSection title="Terapi Kontrolleri">
-        <View className="flex-row flex-wrap justify-center">
+        {errorText ? <Text style={styles.inlineError}>{errorText}</Text> : null}
+        <View style={styles.rowWrap}>
           <ControlButton onPress={() => sendCommandWithNotification("start", "Terapi Başlatıldı", "Yeni bir terapi seansı başladı.")} text="Başlat" colorClass="bg-emerald-500" />
           <ControlButton onPress={handlePauseResume} text={isPaused ? "Devam" : "Beklet"} colorClass="bg-amber-500" />
           <ControlButton onPress={() => { sendCommandWithNotification("stop", "Terapi Durduruldu", "Terapi seansı sonlandırıldı."); cancelAllNotifications(); }} text="Durdur" colorClass="bg-rose-500" />
@@ -82,26 +96,71 @@ const Remote = ({ navigation }) => {
       </ControlSection>
 
       <ControlSection title="Cihaz Ayarları">
-        <View className="flex-row justify-between items-center w-full mb-4">
-            <ControlButton onPress={() => sendCommandWithNotification("footdecrease", "Ayar Değişikliği", "Ayak numarası küçültüldü.")} icon="remove" colorClass="bg-gray-300" textClass="text-black" />
-            <Text className="text-lg font-semibold text-gray-700">Ayak Numarası</Text>
-            <ControlButton onPress={() => sendCommandWithNotification("footincrease", "Ayar Değişikliği", "Ayak numarası büyütüldü.")} icon="add" colorClass="bg-gray-300" textClass="text-black" />
+        <View style={styles.settingsRow}>
+          <ControlButton onPress={() => sendCommandWithNotification("footdecrease", "Ayar Değişikliği", "Ayak numarası küçültüldü.")} icon="remove" colorClass="bg-gray-300" textClass="text-black" />
+          <Text style={styles.settingLabel}>Ayak Numarası</Text>
+          <ControlButton onPress={() => sendCommandWithNotification("footincrease", "Ayar Değişikliği", "Ayak numarası büyütüldü.")} icon="add" colorClass="bg-gray-300" textClass="text-black" />
         </View>
-         <View className="flex-row justify-between items-center w-full mb-4">
-            <ControlButton onPress={() => sendCommandWithNotification("bardown", "Ayar Değişikliği", "Destek barı alçaltıldı.")} icon="remove" colorClass="bg-gray-300" textClass="text-black" />
-            <Text className="text-lg font-semibold text-gray-700">Destek Barı</Text>
-            <ControlButton onPress={() => sendCommandWithNotification("barup", "Ayar Değişikliği", "Destek barı yükseltildi.")} icon="add" colorClass="bg-gray-300" textClass="text-black" />
+        <View style={styles.settingsRow}>
+          <ControlButton onPress={() => sendCommandWithNotification("bardown", "Ayar Değişikliği", "Destek barı alçaltıldı.")} icon="remove" colorClass="bg-gray-300" textClass="text-black" />
+          <Text style={styles.settingLabel}>Destek Barı</Text>
+          <ControlButton onPress={() => sendCommandWithNotification("barup", "Ayar Değişikliği", "Destek barı yükseltildi.")} icon="add" colorClass="bg-gray-300" textClass="text-black" />
         </View>
-         <View className="flex-row justify-between items-center w-full">
-            <ControlButton onPress={() => sendCommandWithNotification("weightdecrease", "Ayar Değişikliği", "Ağırlık azaltma düşürüldü.")} icon="remove" colorClass="bg-gray-300" textClass="text-black" />
-            <Text className="text-lg font-semibold text-gray-700">Ağırlık Azaltma</Text>
-            <ControlButton onPress={() => sendCommandWithNotification("weightincrease", "Ayar Değişikliği", "Ağırlık azaltma artırıldı.")} icon="add" colorClass="bg-gray-300" textClass="text-black" />
+        <View style={styles.settingsRow}>
+          <ControlButton onPress={() => sendCommandWithNotification("weightdecrease", "Ayar Değişikliği", "Ağırlık azaltma düşürüldü.")} icon="remove" colorClass="bg-gray-300" textClass="text-black" />
+          <Text style={styles.settingLabel}>Ağırlık Azaltma</Text>
+          <ControlButton onPress={() => sendCommandWithNotification("weightincrease", "Ayar Değişikliği", "Ağırlık azaltma artırıldı.")} icon="add" colorClass="bg-gray-300" textClass="text-black" />
         </View>
       </ControlSection>
-
-    </ScrollView>
+    </Animated.ScrollView>
   );
 };
 
-export default Remote;
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    backgroundColor: '#EEF2F7',
+    padding: 16,
+    paddingTop: 24
+  },
+  hostCard: {
+    backgroundColor: '#fff',
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3
+  },
+  hostTitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    letterSpacing: 0.5
+  },
+  hostValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827'
+  },
+  rowWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center'
+  },
+  settingsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 12
+  },
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151'
+  }
+});
 
+export default Remote;

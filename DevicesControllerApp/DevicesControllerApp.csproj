@@ -73,6 +73,8 @@
     <Compile Include="Kullanici\UserRegistration.Designer.cs">
       <DependentUpon>UserRegistration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mobil\DiscoveryServer.cs" />
+    <Compile Include="Mobil\EngineApiHost.cs" />
     <Compile Include="Mobil\MobileCommandServer.cs" />
     <Compile Include="Mobil\MobileService.cs" />
     <Compile Include="Motivasyon Oyunu\GameService.cs" />

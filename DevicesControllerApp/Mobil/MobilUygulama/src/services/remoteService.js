@@ -53,7 +53,9 @@ const remoteService = async (ip, port, command) => {
 
   } catch (error) {
     console.error(`'${command}' komutu gönderilemedi:`, error);
-    throw error;
+    const friendly = new Error(error.message?.includes("Network") ? "API erişilemiyor (durdurulmuş olabilir)." : error.message || "İstek başarısız.");
+    friendly.status = error.status;
+    throw friendly;
   }
 };
 
