@@ -42,7 +42,9 @@ const remoteService = async (ip, port, command) => {
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: `API isteği başarısız oldu. Durum Kodu: ${response.status}` }));
-      throw new Error(errorData.message || "Bilinmeyen bir API hatası oluştu.");
+      const err = new Error(errorData.message || "Bilinmeyen bir API hatası oluştu.");
+      err.status = response.status;
+      throw err;
     }
 
     const data = await response.json(); 

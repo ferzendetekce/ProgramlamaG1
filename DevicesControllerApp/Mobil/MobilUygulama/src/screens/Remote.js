@@ -41,7 +41,7 @@ const Remote = ({ navigation }) => {
     } catch (error) {
       console.error(`'${command}' komutu gönderilirken hata:`, error);
       sendErrorNotification('Cihaza komut gönderilemedi.');
-      if (error.message.includes("401")) {
+      if (error.status === 401) {
         Alert.alert(
           "Oturum Hatası",
           "Oturumunuzun süresi dolmuş. Lütfen tekrar giriş yapın.",

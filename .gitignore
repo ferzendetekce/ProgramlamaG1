@@ -427,3 +427,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/.vs
+.vs/DevicesControllerApp/v17/.suo
+DevicesControllerApp/DevicesControllerApp.csproj
+.vs/DevicesControllerApp/v17/DocumentLayout.json
+/DevicesControllerApp/obj/Debug
+/DevicesControllerApp/bin/Debug

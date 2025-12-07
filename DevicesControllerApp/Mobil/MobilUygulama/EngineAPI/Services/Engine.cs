@@ -1,39 +1,46 @@
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using RehabilitationSystem.EngineAPI.Models;
 
 namespace RehabilitationSystem.EngineAPI.Services
 {
     /// <summary>
     /// Windows uygulamasındaki ana motor ile asenkron TCP soket iletişimi kuran servis.
-    /// Bağlantıyı yeniden kullanarak performansı artırır.
     /// </summary>
     public static class Engine
     {
-        private static readonly string engineIp = "127.0.0.1"; // Ana makinenin IP adresi
-        private static readonly int enginePort = 9000; // Ana makinenin portu
+        private static readonly string engineIp = "127.0.0.1";
+        private static readonly int enginePort = 9000;
 
         private static TcpClient? client;
-        private static readonly object connectionLock = new object();
+        private static readonly object connectionLock = new();
+        private static readonly SemaphoreSlim commandLock = new(1, 1);
+        private static readonly JsonSerializerOptions serializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
-        /// <summary>
-        /// TCP istemcisini ana makineye asenkron olarak bağlar.
-        /// Bağlantı zaten varsa yeniden oluşturmaz, kopmuşsa yeniden kurar.
-        /// </summary>
+        public static string? LastError { get; private set; }
+
         private static async Task ConnectAsync()
         {
-            // 'lock' anahtar kelimesi ile aynı anda birden fazla thread'in bağlantı kurmasını engelle.
             lock (connectionLock)
             {
                 if (client != null && client.Connected)
                 {
-                    return; // Zaten bağlıysa bir şey yapma.
+                    return;
                 }
 
-                // Eğer bağlantı kopmuş veya hiç kurulmamışsa, eskisini temizle.
                 client?.Dispose();
-                client = new TcpClient();
+                client = new TcpClient
+                {
+                    NoDelay = true
+                };
             }
 
             try
@@ -43,67 +50,102 @@ namespace RehabilitationSystem.EngineAPI.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Bağlantı hatası: {ex.Message}");
+                LastError = ex.Message;
                 client?.Dispose();
                 client = null;
-                throw; // Hatanın yukarıya bildirilmesi önemli.
+                throw;
             }
         }
 
-        /// <summary>
-        /// Ana makineye belirtilen komutu asenkron olarak gönderir.
-        /// </summary>
-        private static async Task SendCommandAsync(string cmd)
+        private static async Task<string?> SendRawCommandAsync(string cmd, bool expectResponse, CancellationToken cancellationToken = default)
         {
+            await commandLock.WaitAsync(cancellationToken);
             try
             {
                 await ConnectAsync();
                 if (client == null)
-                    return;
+                {
+                    throw new InvalidOperationException("Ana forma ulaşılamadı.");
+                }
 
-                NetworkStream stream = client.GetStream();
-                byte[] data = Encoding.ASCII.GetBytes(cmd);
-                await stream.WriteAsync(data, 0, data.Length);
+                var stream = client.GetStream();
+                var buffer = Encoding.UTF8.GetBytes($"{cmd}\n");
+                await stream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
                 Console.WriteLine($"Komut gönderildi: {cmd}");
+
+                if (!expectResponse)
+                {
+                    return null;
+                }
+
+                using var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true);
+                return await reader.ReadLineAsync(cancellationToken);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Komut gönderilemedi: {ex.Message}");
-                // Hata durumunda istemciyi temizle ki bir sonraki denemede yeniden bağlansın.
+                LastError = ex.Message;
                 client?.Dispose();
                 client = null;
+                throw;
+            }
+            finally
+            {
+                commandLock.Release();
             }
         }
 
-        // Asenkron Komut Metodları ('speed' parametresi kaldırıldı)
-        public static async Task MoveUp() => await SendCommandAsync("up");
+        private static async Task<CommandEnvelope?> SendCommandForResponseAsync(string command, CancellationToken cancellationToken = default)
+        {
+            var raw = await SendRawCommandAsync(command, expectResponse: true, cancellationToken);
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return null;
+            }
 
-        public static async Task MoveDown() => await SendCommandAsync("down");
+            try
+            {
+                return JsonSerializer.Deserialize<CommandEnvelope>(raw, serializerOptions);
+            }
+            catch (Exception ex)
+            {
+                LastError = $"JSON ayrıştırılamadı: {ex.Message}";
+                return null;
+            }
+        }
 
-        public static async Task MoveLeft() => await SendCommandAsync("left");
+        public static Task<CommandEnvelope?> MoveUp(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("up", cancellationToken);
+        public static Task<CommandEnvelope?> MoveDown(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("down", cancellationToken);
+        public static Task<CommandEnvelope?> MoveLeft(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("left", cancellationToken);
+        public static Task<CommandEnvelope?> MoveRight(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("right", cancellationToken);
+        public static Task<CommandEnvelope?> Start(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("start", cancellationToken);
+        public static Task<CommandEnvelope?> Stop(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("stop", cancellationToken);
+        public static Task<CommandEnvelope?> Pause(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("pause", cancellationToken);
+        public static Task<CommandEnvelope?> Resume(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("resume", cancellationToken);
+        public static Task<CommandEnvelope?> EmergencyStop(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("emergencystop", cancellationToken);
+        public static Task<CommandEnvelope?> FootIncrease(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("footincrease", cancellationToken);
+        public static Task<CommandEnvelope?> FootDecrease(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("footdecrease", cancellationToken);
+        public static Task<CommandEnvelope?> BarUp(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("barup", cancellationToken);
+        public static Task<CommandEnvelope?> BarDown(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("bardown", cancellationToken);
+        public static Task<CommandEnvelope?> WeightIncrease(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("weightincrease", cancellationToken);
+        public static Task<CommandEnvelope?> WeightDecrease(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("weightdecrease", cancellationToken);
 
-        public static async Task MoveRight() => await SendCommandAsync("right");
+        public static async Task<bool> CheckConnectionAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var envelope = await SendCommandForResponseAsync("ping", cancellationToken);
+                return envelope != null && envelope.Status == "ok";
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
-        public static async Task Start() => await SendCommandAsync("start");
-
-        public static async Task Stop() => await SendCommandAsync("stop");
-
-        public static async Task Pause() => await SendCommandAsync("pause");
-
-        public static async Task Resume() => await SendCommandAsync("resume");
-
-        public static async Task EmergencyStop() => await SendCommandAsync("emergencystop");
-
-        public static async Task FootIncrease() => await SendCommandAsync("footincrease");
-
-        public static async Task FootDecrease() => await SendCommandAsync("footdecrease");
-
-        public static async Task BarUp() => await SendCommandAsync("barup");
-
-        public static async Task BarDown() => await SendCommandAsync("bardown");
-
-        public static async Task WeightIncrease() => await SendCommandAsync("weightincrease");
-
-        public static async Task WeightDecrease() => await SendCommandAsync("weightdecrease");
+        public static async Task<TherapySnapshot?> GetTherapySnapshotAsync(CancellationToken cancellationToken = default)
+        {
+            var envelope = await SendCommandForResponseAsync("status", cancellationToken);
+            return envelope?.Therapy;
+        }
     }
 }

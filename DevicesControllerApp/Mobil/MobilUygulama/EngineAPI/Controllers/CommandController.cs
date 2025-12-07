@@ -22,76 +22,47 @@ namespace RehabilitationSystem.EngineAPI.Controllers
             {
                 return BadRequest(new { status = "error", message = "Komut boş olamaz." });
             }
-            Console.WriteLine($"Gelen komut: {request.Command}");
+            var incomingCommand = request.Command.Trim().ToLower();
+            Console.WriteLine($"Gelen komut: {incomingCommand}");
+
+            if (!PermissionMatrix.IsAllowed(User, incomingCommand, out var reason))
+            {
+                return StatusCode(403, new { status = "error", message = reason });
+            }
 
             try
             {
-                switch (request.Command.ToLower())
+                var envelope = incomingCommand switch
                 {
-                    case "start":
-                        await Engine.Start();
-                        break;
-                    case "stop":
-                        await Engine.Stop();
-                        break;
-                    case "pause":
-                        await Engine.Pause();
-                        break;
-                    case "resume":
-                        await Engine.Resume();
-                        break;
-                    case "emergencystop":
-                        if (
-                            !User.IsInRole("Admin")
-                            && !User.IsInRole("Servis")
-                            && !User.IsInRole("Operator")
-                        )
-                        {
-                            return Forbid(); // Kullanıcının rolü bu işlem için yetersiz.
-                        }
-                        await Engine.EmergencyStop();
-                        break;
+                    "start" => await Engine.Start(),
+                    "stop" => await Engine.Stop(),
+                    "pause" => await Engine.Pause(),
+                    "resume" => await Engine.Resume(),
+                    "emergencystop" => await Engine.EmergencyStop(),
+                    "up" => await Engine.MoveUp(),
+                    "down" => await Engine.MoveDown(),
+                    "footincrease" => await Engine.FootIncrease(),
+                    "footdecrease" => await Engine.FootDecrease(),
+                    "barup" => await Engine.BarUp(),
+                    "bardown" => await Engine.BarDown(),
+                    "weightincrease" => await Engine.WeightIncrease(),
+                    "weightdecrease" => await Engine.WeightDecrease(),
+                    _ => null
+                };
 
-                    case "up":
-                        await Engine.MoveUp();
-                        break;
-                    case "down":
-                        await Engine.MoveDown();
-                        break;
-                    case "footincrease":
-                        await Engine.FootIncrease();
-                        break;
-                    case "footdecrease":
-                        await Engine.FootDecrease();
-                        break;
-                    case "barup":
-                        await Engine.BarUp();
-                        break;
-                    case "bardown":
-                        await Engine.BarDown();
-                        break;
-                    case "weightincrease":
-                        await Engine.WeightIncrease();
-                        break;
-                    case "weightdecrease": // Ağırlık Azaltma Azalt
-                        await Engine.WeightDecrease();
-                        break;
-
-                    default:
-                        return BadRequest(
-                            new { status = "error", message = $"Geçersiz komut: {request.Command}" }
-                        );
+                if (envelope == null)
+                {
+                    var errorMessage = Engine.LastError ?? "Ana forma ulaşılamadı.";
+                    return StatusCode(503, new { status = "error", message = errorMessage });
                 }
 
-                return Ok(new { status = "ok", received = request.Command });
+                return Ok(new { status = "ok", received = incomingCommand, therapy = envelope.Therapy });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Komut işlenirken hata oluştu: {ex.Message}");
-                return StatusCode(
-                    500,
-                    new { status = "error", message = "Sunucuda bir hata oluştu." }
-                );
+                var message = Engine.LastError ?? "Sunucuda bir hata oluştu.";
+                return StatusCode(500, new { status = "error", message });
             }
         }
     }
