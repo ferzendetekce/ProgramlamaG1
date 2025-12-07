@@ -917,7 +917,7 @@ namespace RehabilitationSystem.Communication
         public void Dispose()
         {
             ClosePort();
-            if (_serialPort != null)
+            if (_serialPort != null)//
             {
                 _serialPort.Dispose();
                 _serialPort = null;
