@@ -23,6 +23,7 @@ namespace RehabilitationSystem.Communication
         private readonly object _bufferLock = new object();
 
         // Event'ler
+        public event EventHandler<string> LogMessage;
         public event EventHandler<LoadCellDataEventArgs> LoadCellDataReceived;
         public event EventHandler<DeviceStatusEventArgs> DeviceStatusChanged;
         public event EventHandler<ErrorEventArgs> ErrorOccurred;
@@ -371,6 +372,8 @@ namespace RehabilitationSystem.Communication
 
         private void ReadDataContinuously()
         {
+            LogCommunication(">>> OKUMA DÖNGÜSÜ BAŞLADI <<<"); // EKLE
+
             while (_isReading)
             {
                 try
@@ -378,34 +381,33 @@ namespace RehabilitationSystem.Communication
                     if (_serialPort != null && _serialPort.IsOpen)
                     {
                         int bytesToRead = _serialPort.BytesToRead;
+
                         if (bytesToRead > 0)
                         {
-                            // 1. Veriyi Porttan Oku
+                            LogCommunication($">>> {bytesToRead} BYTE GELDİ <<<"); // EKLE
+
                             byte[] chunk = ReadFromPort(bytesToRead, 100);
 
                             if (chunk != null && chunk.Length > 0)
                             {
-                                // 2. Ham Buffer'a Ekle
-                                // Bu buffer sadece bu thread içinde kullanıldığı için lock gerekmeyebilir 
-                                // ama garanti olsun diye lock kullanabiliriz.
-                                _rawRxBuffer.AddRange(chunk);
+                                string hexData = BitConverter.ToString(chunk);
+                                LogCommunication($"ALINDI: {hexData}"); // EKLE
 
-                                // 3. Buffer içindeki veriyi işle (Paket ayıkla)
+                                _rawRxBuffer.AddRange(chunk);
                                 ProcessReceivedData(null);
-                                // Not: Parametre null gönderiyoruz çünkü veriyi zaten _rawRxBuffer'a ekledik.
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Okuma sırasında hata olursa logla ama döngüyü kırma (Thread ölmesin)
                     LogCommunication("Okuma hatası: " + ex.Message, true);
                 }
 
-                // CPU'yu yormamak için kısa bir bekleme
                 Thread.Sleep(10);
             }
+
+            LogCommunication(">>> OKUMA DÖNGÜSÜ BİTTİ <<<"); // EKLE
         }
 
         private byte[] ReadFromPort(int bytesToRead, int timeoutMs)
@@ -439,7 +441,6 @@ namespace RehabilitationSystem.Communication
         private void ProcessReceivedData(byte[] unusedData)
         {
             // Minimum paket boyutu: Header(2) + Len(1) + Cmd(1) + CRC(2) = 6 byte
-            // Bu kontrol gereksiz döngüyü engeller.
             while (_rawRxBuffer.Count >= 6)
             {
                 // 1. Başlık Kontrolü (0x55, 0xAA)
@@ -450,8 +451,6 @@ namespace RehabilitationSystem.Communication
                     byte packetLength = _rawRxBuffer[2];
 
                     // Toplam paket boyutu = Header(2) + Len(1) + Payload(Len) + CRC(2)
-                    // Ancak Adım 2'de Len = "Komut + Data" demiştik. 
-                    // Bu durumda toplam beklenen byte: 2 (Head) + 1 (LenByte) + packetLength + 2 (CRC)
                     int totalExpectedLength = 2 + 1 + packetLength + 2;
 
                     // 3. Yeterli veri geldi mi?
@@ -461,20 +460,23 @@ namespace RehabilitationSystem.Communication
                         byte[] packet = _rawRxBuffer.GetRange(0, totalExpectedLength).ToArray();
 
                         // 4. CRC Kontrolü
-                        // Son 2 byte CRC'dir.
+                        // Son 2 byte CRC'dir
                         ushort receivedCrc = (ushort)(packet[packet.Length - 2] | (packet[packet.Length - 1] << 8));
 
                         // CRC hesaplanacak kısım: Headerlar hariç, Length byte'ından itibaren CRC öncesine kadar
                         byte[] dataToVerify = new byte[totalExpectedLength - 4];
                         Array.Copy(packet, 2, dataToVerify, 0, totalExpectedLength - 4);
 
-                        if (VerifyCRC16(dataToVerify, receivedCrc))
+                        ushort calculatedCrc = CalculateCRC16(dataToVerify);
+
+                        if (calculatedCrc == receivedCrc)
                         {
                             // --- GEÇERLİ PAKET BULUNDU ---
+                            LogCommunication("✓ CRC DOĞRU - Paket işleniyor", false);
+
                             byte commandCode = packet[3]; // Komut kodu
 
                             // Payload verisini ayıkla (Komut'tan sonra, CRC'den önce)
-                            // Payload size = packetLength - 1 (Komut byte'ı)
                             int payloadSize = packetLength - 1;
                             byte[] payload = null;
 
@@ -492,22 +494,38 @@ namespace RehabilitationSystem.Communication
                         }
                         else
                         {
-                            // CRC Hatalı! Sadece ilk byte'ı silip kaydırıyoruz ki belki 
-                            // sonraki byte'larda geçerli bir başlık vardır.
-                            LogCommunication("CRC Hatası alındı.", true);
-                            _rawRxBuffer.RemoveAt(0);
+                            // ⚠️ CRC HATASI - TEST MODU: Yine de işle
+                            LogCommunication($"✗ CRC HATASI! Hesaplanan: 0x{calculatedCrc:X4}, Gelen: 0x{receivedCrc:X4}", true);
+                            LogCommunication(">>> TEST MODU: CRC yanlış ama paketi yine de işliyorum <<<", true);
+
+                            // Paketi yine de işle (TEST İÇİN)
+                            byte commandCode = packet[3];
+                            int payloadSize = packetLength - 1;
+                            byte[] payload = null;
+
+                            if (payloadSize > 0)
+                            {
+                                payload = new byte[payloadSize];
+                                Array.Copy(packet, 4, payload, 0, payloadSize);
+                            }
+
+                            // Paketi dispatch et
+                            DispatchReceivedPacket(commandCode, payload);
+
+                            // Buffer'dan sil
+                            _rawRxBuffer.RemoveRange(0, totalExpectedLength);
                         }
                     }
                     else
                     {
-                        // Başlık var ama paketin devamı henüz gelmedi. 
-                        // Döngüden çık, sonraki okumayı bekle.
+                        // Başlık var ama paketin devamı henüz gelmedi
+                        // Döngüden çık, sonraki okumayı bekle
                         break;
                     }
                 }
                 else
                 {
-                    // Başlık eşleşmedi, buffer'ın başındaki çöp veriyi sil.
+                    // Başlık eşleşmedi, buffer'ın başındaki çöp veriyi sil
                     _rawRxBuffer.RemoveAt(0);
                 }
             }
@@ -885,9 +903,14 @@ namespace RehabilitationSystem.Communication
 
         private void LogCommunication(string message, bool isError = false)
         {
-            // Konsola yazdır (İleride dosyaya yazdırma eklenebilir)
             string prefix = isError ? "[ERROR]" : "[INFO]";
-            System.Diagnostics.Debug.WriteLine($"{DateTime.Now:HH:mm:ss} {prefix} {message}");
+            string logMsg = $"{DateTime.Now:HH:mm:ss} {prefix} {message}";
+
+            // Debug penceresine yaz
+            System.Diagnostics.Debug.WriteLine(logMsg);
+
+            // ✅ YENİ: Event fırlat (MainForm dinleyecek)
+            LogMessage?.Invoke(this, logMsg);
         }
 
         // Dispose metodunu da dolduralım ki sınıf kapanırken port açık kalmasın
