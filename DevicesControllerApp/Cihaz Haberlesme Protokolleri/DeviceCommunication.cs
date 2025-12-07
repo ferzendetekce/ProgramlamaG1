@@ -16,6 +16,7 @@ namespace RehabilitationSystem.Communication
         private bool _isReading;
         private Queue<byte[]> _commandQueue;
         private readonly object _queueLock = new object();
+        private List<byte> _rawRxBuffer = new List<byte>();
 
         // Buffer'lar
         private Queue<LoadCellDataPacket> _loadCellBuffer;
@@ -55,48 +56,179 @@ namespace RehabilitationSystem.Communication
 
         private DeviceCommunication()
         {
-            // Başlangıç ayarları
+            // Buffer'ı oluşturuyoruz
+            _loadCellBuffer = new Queue<LoadCellDataPacket>();
+            _commandQueue = new Queue<byte[]>();
         }
 
         public bool OpenPort(string portName, int baudRate = 9600, Parity parity = Parity.None,
-            int dataBits = 8, StopBits stopBits = StopBits.One)
+    int dataBits = 8, StopBits stopBits = StopBits.One)
         {
-            return false;
+            lock (_lock) // Thread safety için
+            {
+                try
+                {
+                    if (IsConnected) return true; // Zaten açıksa işlem yapma
+
+                    InitializePort(); // Port nesnesini sıfırla/oluştur
+
+                    _serialPort.PortName = portName;
+                    _serialPort.BaudRate = baudRate;
+                    _serialPort.Parity = parity;
+                    _serialPort.DataBits = dataBits;
+                    _serialPort.StopBits = stopBits;
+
+                    _serialPort.Open();
+
+                    CurrentPort = portName;
+                    BaudRate = baudRate;
+                    IsConnected = true;
+
+                    // Okuma Thread'ini başlat (Henüz içini doldurmadık ama start veriyoruz)
+                    StartReadingThread();
+
+                    // Event tetikle: Bağlantı başarılı
+                    OnConnectionStatusChanged(true, portName);
+                    LogCommunication($"Port açıldı: {portName} @ {baudRate}", false);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    IsConnected = false;
+                    HandleCommunicationError(ex, "OpenPort");
+                    return false;
+                }
+            }
         }
 
         public bool ClosePort()
         {
-            return false;
+            lock (_lock)
+            {
+                try
+                {
+                    if (!IsConnected) return true;
+
+                    // Önce okuma thread'ini durdur
+                    StopReadingThread();
+
+                    if (_serialPort != null && _serialPort.IsOpen)
+                    {
+                        // Dtr ve Rts pinlerini kapatmak bazen cihazı resetlemek için gerekebilir
+                        _serialPort.DtrEnable = false;
+                        _serialPort.RtsEnable = false;
+
+                        // Bufferları temizle
+                        _serialPort.DiscardInBuffer();
+                        _serialPort.DiscardOutBuffer();
+
+                        _serialPort.Close();
+                    }
+
+                    IsConnected = false;
+
+                    // Event tetikle: Bağlantı kesildi
+                    OnConnectionStatusChanged(false, CurrentPort);
+                    LogCommunication("Port kapatıldı.", false);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    HandleCommunicationError(ex, "ClosePort");
+                    return false;
+                }
+            }
         }
 
         public string[] GetAvailablePorts()
         {
-            return null;
+            return SerialPort.GetPortNames();
         }
 
         public bool IsPortOpen()
         {
-            return false;
+            return _serialPort != null && _serialPort.IsOpen;
         }
 
         private void InitializePort()
         {
-            // Port başlangıç ayarları
+            // Eğer port daha önce oluşturulmuşsa temizleyelim
+            if (_serialPort != null)
+            {
+                if (_serialPort.IsOpen) _serialPort.Close();
+                _serialPort.Dispose();
+            }
+
+            _serialPort = new SerialPort();
+
+            // Temel timeout ayarları (okuma/yazma kilitlenmesin diye)
+            _serialPort.ReadTimeout = 500;
+            _serialPort.WriteTimeout = 500;
         }
 
         public ushort CalculateCRC16(byte[] data)
         {
-            return 0;
+            ushort crc = 0xFFFF;
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                crc ^= (ushort)(data[i]); // Byte'ı XOR'la
+
+                for (int j = 0; j < 8; j++)
+                {
+                    if ((crc & 1) != 0)
+                    {
+                        crc >>= 1;
+                        crc ^= 0xA001;
+                    }
+                    else
+                    {
+                        crc >>= 1;
+                    }
+                }
+            }
+            return crc;
         }
 
         public byte CalculateChecksum(byte[] data)
         {
-            return 0;
+            byte sum = 0;
+            foreach (byte b in data)
+            {
+                unchecked { sum += b; }
+            }
+            return sum;
         }
 
+        // CRC Doğrulama Yardımcısı
         public bool VerifyCRC16(byte[] data, ushort receivedCrc)
         {
-            return false;
+            ushort calculated = CalculateCRC16(data);
+            return calculated == receivedCrc;
+        }
+
+        private void DispatchReceivedPacket(byte commandCode, byte[] payload)
+        {
+            // Komut koduna göre işlem yap (Enum: CommandCode)
+            CommandCode code = (CommandCode)commandCode;
+
+            switch (code)
+            {
+                case CommandCode.ReadLoadCell: // Örnek: LoadCell verisi geldi
+                    ParseLoadCellData(payload);
+                    break;
+
+                case CommandCode.ReadStatus: // Cihaz durumu geldi
+                                             // ParseDeviceStatus(payload); // Bu metodu sonra yazarız
+                    break;
+
+                default:
+                    // Genel komut yanıtı olarak event fırlat
+                    OnCommandResponseReceived(commandCode, payload);
+                    break;
+            }
         }
 
         public bool VerifyChecksum(byte[] data, byte receivedChecksum)
@@ -106,7 +238,19 @@ namespace RehabilitationSystem.Communication
 
         public bool SendCommand(byte commandCode, byte[] data = null)
         {
-            return false;
+            try
+            {
+                // 1. Paketi oluştur
+                byte[] packet = BuildCommandPacket(commandCode, data);
+
+                // 2. Porta yaz
+                return WriteToPort(packet);
+            }
+            catch (Exception ex)
+            {
+                OnErrorOccurred($"Komut gönderme hatası: {ex.Message}", ErrorLevel.Error);
+                return false;
+            }
         }
 
         public byte[] SendCommandAndWaitResponse(byte commandCode, byte[] data = null,
@@ -117,12 +261,77 @@ namespace RehabilitationSystem.Communication
 
         private byte[] BuildCommandPacket(byte commandCode, byte[] data)
         {
-            return null;
+            // Örnek Protokol Yapısı:
+            // [0] Header 1 (0x55)
+            // [1] Header 2 (0xAA)
+            // [2] Data Length (Komut + Data uzunluğu)
+            // [3] Command Code
+            // [4...] Data (Varsa)
+            // [Son-1] CRC Low
+            // [Son] CRC High
+
+            List<byte> packet = new List<byte>();
+
+            // 1. Başlıklar (Preamble)
+            packet.Add(0x55);
+            packet.Add(0xAA);
+
+            // 2. Veri Hazırlığı
+            int dataLength = (data != null) ? data.Length : 0;
+
+            // Uzunluk: Komut (1 byte) + Data Uzunluğu
+            packet.Add((byte)(1 + dataLength));
+
+            // 3. Komut
+            packet.Add(commandCode);
+
+            // 4. Veri (Payload)
+            if (data != null && data.Length > 0)
+            {
+                packet.AddRange(data);
+            }
+
+            // 5. CRC Hesaplama (Başlıklar hariç, Length'den itibaren hesaplanır - Cihaz protokolüne göre değişebilir)
+            // Burada tüm paket içeriği üzerinden hesaplıyoruz (Headerlar hariç pratik bir yaklaşım)
+            byte[] payloadForCrc = packet.GetRange(2, packet.Count - 2).ToArray();
+            ushort crc = CalculateCRC16(payloadForCrc);
+
+            packet.Add((byte)(crc & 0xFF));        // Low Byte
+            packet.Add((byte)((crc >> 8) & 0xFF)); // High Byte
+
+            return packet.ToArray();
         }
 
         private bool WriteToPort(byte[] data)
         {
-            return false;
+            if (!IsConnected || _serialPort == null || !_serialPort.IsOpen)
+            {
+                LogCommunication("Port açık değil, veri gönderilemedi.", true);
+                return false;
+            }
+
+            lock (_lock) // Thread safety: Aynı anda tek bir yazma işlemi
+            {
+                try
+                {
+                    // Yazmadan önce buffer'ı temizlemek opsiyoneldir, 
+                    // ama yanıt bekleyen sistemlerde eski veriyi temizlemek iyidir.
+                    // _serialPort.DiscardOutBuffer(); 
+
+                    _serialPort.Write(data, 0, data.Length);
+
+                    // Debug için log (Canlı sistemde performans için kapatılabilir)
+                    string hexData = BitConverter.ToString(data);
+                    LogCommunication($"GÖNDERİLDİ: {hexData}");
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    HandleCommunicationError(ex, "WriteToPort");
+                    return false;
+                }
+            }
         }
 
         private void AddToCommandQueue(byte[] command)
@@ -135,112 +344,360 @@ namespace RehabilitationSystem.Communication
             // Komut kuyruğunu işleme
         }
 
-       
+
 
         private void StartReadingThread()
         {
-            // Okuma thread'ini başlatma
+            if (_readThread != null && _readThread.IsAlive)
+                return;
+
+            _isReading = true;
+            _readThread = new Thread(ReadDataContinuously);
+            _readThread.IsBackground = true; // Uygulama kapanırsa thread de kapansın
+            _readThread.Name = "SerialReadThread";
+            _readThread.Start();
         }
 
         private void StopReadingThread()
         {
-            // Okuma thread'ini durdurma
+            _isReading = false;
+
+            // Thread'in durmasını bekle (maksimum 500ms)
+            if (_readThread != null && _readThread.IsAlive)
+            {
+                _readThread.Join(500);
+            }
         }
 
         private void ReadDataContinuously()
         {
-            // Sürekli veri okuma (thread içinde çalışacak)
+            while (_isReading)
+            {
+                try
+                {
+                    if (_serialPort != null && _serialPort.IsOpen)
+                    {
+                        int bytesToRead = _serialPort.BytesToRead;
+                        if (bytesToRead > 0)
+                        {
+                            // 1. Veriyi Porttan Oku
+                            byte[] chunk = ReadFromPort(bytesToRead, 100);
+
+                            if (chunk != null && chunk.Length > 0)
+                            {
+                                // 2. Ham Buffer'a Ekle
+                                // Bu buffer sadece bu thread içinde kullanıldığı için lock gerekmeyebilir 
+                                // ama garanti olsun diye lock kullanabiliriz.
+                                _rawRxBuffer.AddRange(chunk);
+
+                                // 3. Buffer içindeki veriyi işle (Paket ayıkla)
+                                ProcessReceivedData(null);
+                                // Not: Parametre null gönderiyoruz çünkü veriyi zaten _rawRxBuffer'a ekledik.
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Okuma sırasında hata olursa logla ama döngüyü kırma (Thread ölmesin)
+                    LogCommunication("Okuma hatası: " + ex.Message, true);
+                }
+
+                // CPU'yu yormamak için kısa bir bekleme
+                Thread.Sleep(10);
+            }
         }
 
         private byte[] ReadFromPort(int bytesToRead, int timeoutMs)
         {
-            // Port'tan veri okuma
-            return null;
+            byte[] buffer = new byte[bytesToRead];
+            try
+            {
+                // Okuma işlemi
+                int readCount = _serialPort.Read(buffer, 0, bytesToRead);
+
+                // Eğer istenenden az okunduysa array'i küçült (nadiren gerekir)
+                if (readCount < bytesToRead)
+                {
+                    byte[] actualData = new byte[readCount];
+                    Array.Copy(buffer, actualData, readCount);
+                    return actualData;
+                }
+                return buffer;
+            }
+            catch (TimeoutException)
+            {
+                return null; // Timeout normaldir, veri yok demektir.
+            }
+            catch (Exception ex)
+            {
+                HandleCommunicationError(ex, "ReadFromPort");
+                return null;
+            }
         }
 
-        private void ProcessReceivedData(byte[] data)
+        private void ProcessReceivedData(byte[] unusedData)
         {
-            // Gelen veriyi işleme ve parse etme
+            // Minimum paket boyutu: Header(2) + Len(1) + Cmd(1) + CRC(2) = 6 byte
+            // Bu kontrol gereksiz döngüyü engeller.
+            while (_rawRxBuffer.Count >= 6)
+            {
+                // 1. Başlık Kontrolü (0x55, 0xAA)
+                if (_rawRxBuffer[0] == 0x55 && _rawRxBuffer[1] == 0xAA)
+                {
+                    // 2. Uzunluk Bilgisini Al (3. byte uzunluk bilgisidir)
+                    // Protokolümüze göre: Len = Komut(1) + Data(N)
+                    byte packetLength = _rawRxBuffer[2];
+
+                    // Toplam paket boyutu = Header(2) + Len(1) + Payload(Len) + CRC(2)
+                    // Ancak Adım 2'de Len = "Komut + Data" demiştik. 
+                    // Bu durumda toplam beklenen byte: 2 (Head) + 1 (LenByte) + packetLength + 2 (CRC)
+                    int totalExpectedLength = 2 + 1 + packetLength + 2;
+
+                    // 3. Yeterli veri geldi mi?
+                    if (_rawRxBuffer.Count >= totalExpectedLength)
+                    {
+                        // Paketi geçici diziye al
+                        byte[] packet = _rawRxBuffer.GetRange(0, totalExpectedLength).ToArray();
+
+                        // 4. CRC Kontrolü
+                        // Son 2 byte CRC'dir.
+                        ushort receivedCrc = (ushort)(packet[packet.Length - 2] | (packet[packet.Length - 1] << 8));
+
+                        // CRC hesaplanacak kısım: Headerlar hariç, Length byte'ından itibaren CRC öncesine kadar
+                        byte[] dataToVerify = new byte[totalExpectedLength - 4];
+                        Array.Copy(packet, 2, dataToVerify, 0, totalExpectedLength - 4);
+
+                        if (VerifyCRC16(dataToVerify, receivedCrc))
+                        {
+                            // --- GEÇERLİ PAKET BULUNDU ---
+                            byte commandCode = packet[3]; // Komut kodu
+
+                            // Payload verisini ayıkla (Komut'tan sonra, CRC'den önce)
+                            // Payload size = packetLength - 1 (Komut byte'ı)
+                            int payloadSize = packetLength - 1;
+                            byte[] payload = null;
+
+                            if (payloadSize > 0)
+                            {
+                                payload = new byte[payloadSize];
+                                Array.Copy(packet, 4, payload, 0, payloadSize);
+                            }
+
+                            // Paketi ilgili yere yönlendir
+                            DispatchReceivedPacket(commandCode, payload);
+
+                            // İşlenen paketi buffer'dan sil
+                            _rawRxBuffer.RemoveRange(0, totalExpectedLength);
+                        }
+                        else
+                        {
+                            // CRC Hatalı! Sadece ilk byte'ı silip kaydırıyoruz ki belki 
+                            // sonraki byte'larda geçerli bir başlık vardır.
+                            LogCommunication("CRC Hatası alındı.", true);
+                            _rawRxBuffer.RemoveAt(0);
+                        }
+                    }
+                    else
+                    {
+                        // Başlık var ama paketin devamı henüz gelmedi. 
+                        // Döngüden çık, sonraki okumayı bekle.
+                        break;
+                    }
+                }
+                else
+                {
+                    // Başlık eşleşmedi, buffer'ın başındaki çöp veriyi sil.
+                    _rawRxBuffer.RemoveAt(0);
+                }
+            }
         }
+
 
         public bool RequestLoadCellData()
         {
             return false;
         }
 
-        private void ParseLoadCellData(byte[] data)
+        private void ParseLoadCellData(byte[] payload)
         {
-            // LoadCell verisini parse etme
+            // Beklenen veri boyutu kontrolü (4 float + 1 int = 20 byte)
+            if (payload == null || payload.Length < 20)
+            {
+                LogCommunication("Eksik LoadCell verisi alındı.", true);
+                return;
+            }
+
+            try
+            {
+                LoadCellDataPacket packet = new LoadCellDataPacket();
+
+                // Byte dizisinden sayısal değerlere dönüşüm (Little Endian varsayımı)
+                // Not: Cihaz 'double' gönderiyorsa ToDouble, 'float' gönderiyorsa ToSingle kullanılır.
+                // Genelde mikrodenetleyicilerde float (4 byte) tercih edilir.
+                packet.RightHeel = BitConverter.ToSingle(payload, 0);
+                packet.RightToe = BitConverter.ToSingle(payload, 4);
+                packet.LeftHeel = BitConverter.ToSingle(payload, 8);
+                packet.LeftToe = BitConverter.ToSingle(payload, 12);
+                packet.Index = BitConverter.ToInt32(payload, 16);
+
+                packet.Timestamp = DateTime.Now;
+
+                // Hesaplanan Değerler (PC tarafında hesaplamak daha iyidir)
+                double totalRight = packet.RightHeel + packet.RightToe;
+                double totalLeft = packet.LeftHeel + packet.LeftToe;
+                double totalWeight = totalRight + totalLeft;
+
+                // Denge Oranı (%50 - %50 ideal)
+                if (totalWeight > 0)
+                    packet.WeightBalance = (totalRight / totalWeight) * 100;
+                else
+                    packet.WeightBalance = 50.0;
+
+                // 1. Buffer'a ekle
+                AddToLoadCellBuffer(packet);
+
+                // 2. Event fırlat (Canlı grafik çizimi için anlık veri)
+                OnLoadCellDataReceived(packet);
+            }
+            catch (Exception ex)
+            {
+                LogCommunication("Parse hatası: " + ex.Message, true);
+            }
         }
+
+        private const int MAX_BUFFER_SIZE = 5000; // Örn: 50 saniyelik veri (100Hz ise)
 
         private void AddToLoadCellBuffer(LoadCellDataPacket packet)
         {
-            // LoadCell buffer'ına ekleme
+            lock (_bufferLock)
+            {
+                // Kapasite dolduysa en eski veriyi at
+                if (_loadCellBuffer.Count >= MAX_BUFFER_SIZE)
+                {
+                    _loadCellBuffer.Dequeue();
+                }
+
+                _loadCellBuffer.Enqueue(packet);
+            }
         }
+
+        // Dış dünyanın veriyi çekmesi için metotlar:
 
         public LoadCellDataPacket GetLatestLoadCellData()
         {
-            return null;
+            lock (_bufferLock)
+            {
+                if (_loadCellBuffer.Count > 0)
+                {
+                    // Son elemanı döndür ama kuyruktan silme (Peek)
+                    // Eğer son elemanı almak için kuyruğu "Last" ile sorgularsak O(n) olabilir,
+                    // Queue yapısında genelde son ekleneni almak için ToArray maliyetlidir.
+                    // Performans için "son eklenen" değişkeni tutmak daha iyidir ama
+                    // basitlik adına ToArray().Last() yerine şunu yapabiliriz:
+
+                    // Not: Queue FIFO (İlk giren ilk çıkar) yapısındadır.
+                    // En son eklenen veriye Queue üzerinden doğrudan erişim yoktur.
+                    // Bu yüzden _lastPacket diye bir değişken tutup onu dönmek en hızlısıdır.
+                    // Ancak şimdilik güvenli yol (kopya alıp sonuncuya bakmak):
+                    return _loadCellBuffer.ToArray()[_loadCellBuffer.Count - 1];
+                }
+                return null;
+            }
         }
 
+        // Uygulamanın belirli bir miktarda veriyi (örn: son 100 veri) çekmesi için
         public List<LoadCellDataPacket> GetLoadCellBuffer(int count)
         {
-            return null;
+            lock (_bufferLock)
+            {
+                var allData = _loadCellBuffer.ToArray();
+
+                if (allData.Length <= count)
+                {
+                    return new List<LoadCellDataPacket>(allData);
+                }
+                else
+                {
+                    // Son 'count' kadar veriyi al
+                    int startIndex = allData.Length - count;
+                    List<LoadCellDataPacket> result = new List<LoadCellDataPacket>();
+                    for (int i = startIndex; i < allData.Length; i++)
+                    {
+                        result.Add(allData[i]);
+                    }
+                    return result;
+                }
+            }
         }
 
         public void ClearLoadCellBuffer()
         {
-            // LoadCell buffer'ını temizleme
+            lock (_bufferLock)
+            {
+                _loadCellBuffer.Clear();
+            }
         }
 
         private void OnLoadCellDataReceived(LoadCellDataPacket data)
         {
-            // LoadCell event tetikleme
+            // Event null kontrolü (? operatörü ile)
+            LoadCellDataReceived?.Invoke(this, new LoadCellDataEventArgs
+            {
+                Data = data,
+                Timestamp = DateTime.Now
+            });
         }
+
+        // Mevcut "return false" dönen metotları bunlarla değiştirin:
 
         public bool StartTherapy()
         {
-            return false;
+            LogCommunication("Terapi başlatılıyor...");
+            return SendCommand((byte)CommandCode.StartTherapy);
         }
 
         public bool StopTherapy()
         {
-            return false;
+            LogCommunication("Terapi durduruluyor...");
+            return SendCommand((byte)CommandCode.StopTherapy);
         }
 
         public bool PauseTherapy()
         {
-            return false;
+            return SendCommand((byte)CommandCode.PauseTherapy);
         }
 
         public bool ResumeTherapy()
         {
-            return false;
+            return SendCommand((byte)CommandCode.ResumeTherapy);
         }
 
         public bool EmergencyStop()
         {
-            return false;
+            LogCommunication("!!! ACİL DURDURMA !!!", true);
+            return SendCommand((byte)CommandCode.EmergencyStop);
         }
 
         public bool SetSpeed(double speed)
         {
-            return false;
+            // Hızı float (4 byte) olarak gönderiyoruz
+            return SendCommand((byte)CommandCode.SetSpeed, BitConverter.GetBytes((float)speed));
         }
 
         public bool SetShoeSize(int size)
         {
-            return false;
+            return SendCommand((byte)CommandCode.SetShoeSize, BitConverter.GetBytes(size));
         }
 
         public bool SetSupportBarHeight(double height)
         {
-            return false;
+            return SendCommand((byte)CommandCode.SetSupportBar, BitConverter.GetBytes((float)height));
         }
 
         public bool SetWeightReduction(double weight)
         {
-            return false;
+            return SendCommand((byte)CommandCode.SetWeightReduction, BitConverter.GetBytes((float)weight));
         }
 
         public bool SetWinchPosition(bool up)
@@ -255,17 +712,23 @@ namespace RehabilitationSystem.Communication
 
         public bool HomeDevice()
         {
-            return false;
+            return SendCommand((byte)CommandCode.HomeDevice);
         }
 
         public bool SetServoMotorPosition(int motorIndex, int position)
         {
-            return false;
+            List<byte> payload = new List<byte>();
+            payload.Add((byte)motorIndex);
+            payload.AddRange(BitConverter.GetBytes(position));
+            return SendCommand((byte)CommandCode.SetServoMotor, payload.ToArray());
         }
 
         public bool SetStepMotorPosition(int motorIndex, int steps)
         {
-            return false;
+            List<byte> payload = new List<byte>();
+            payload.Add((byte)motorIndex);
+            payload.AddRange(BitConverter.GetBytes(steps));
+            return SendCommand((byte)CommandCode.SetStepMotor, payload.ToArray());
         }
 
         public int GetServoMotorPosition(int motorIndex)
@@ -310,7 +773,8 @@ namespace RehabilitationSystem.Communication
 
         public DeviceStatus QueryDeviceStatus()
         {
-            return null;
+            SendCommand((byte)CommandCode.ReadStatus);
+            return null; // Yanıt asenkron olarak event ile gelecek
         }
 
         public bool IsDeviceReady()
@@ -333,16 +797,30 @@ namespace RehabilitationSystem.Communication
             // Cihaz durumu değişikliği event tetikleme
         }
 
-        
+
 
         private void HandleCommunicationError(Exception ex, string operation)
         {
-            // İletişim hatası yönetimi
+            string msg = $"Hata ({operation}): {ex.Message}";
+            LogCommunication(msg, true);
+            OnErrorOccurred(msg, ErrorLevel.Error);
+
+            // Eğer okuma/yazma hatası ise ve port koptuysa durumu bildir
+            if ((operation == "ReadFromPort" || operation == "WriteToPort") && _serialPort != null && !_serialPort.IsOpen)
+            {
+                IsConnected = false;
+                OnConnectionStatusChanged(false, CurrentPort);
+            }
         }
 
         private void OnErrorOccurred(string errorMessage, ErrorLevel level)
         {
-            // Hata event tetikleme
+            ErrorOccurred?.Invoke(this, new ErrorEventArgs
+            {
+                ErrorMessage = errorMessage,
+                Level = level,
+                Timestamp = DateTime.Now
+            });
         }
 
         public string GetLastError()
@@ -360,21 +838,34 @@ namespace RehabilitationSystem.Communication
             return false;
         }
 
-      
+
 
         private void OnConnectionStatusChanged(bool isConnected, string portName)
         {
-            // Bağlantı durumu event tetikleme
+            ConnectionStatusChanged?.Invoke(this, new ConnectionEventArgs
+            {
+                IsConnected = isConnected,
+                PortName = portName,
+                Timestamp = DateTime.Now
+            });
         }
 
         private void OnCommandResponseReceived(byte commandCode, byte[] response)
         {
-            // Komut yanıtı event tetikleme
+            CommandResponseReceived?.Invoke(this, new CommandResponseEventArgs
+            {
+                CommandCode = commandCode,
+                Response = response,
+                IsSuccess = true,
+                Timestamp = DateTime.Now
+            });
         }
 
         private byte[] ConvertDoubleToBytes(double value)
         {
-            return null;
+            // Endianness (BigEndian/LittleEndian) cihazın işlemcisine göre değişir. 
+            // Genellikle PC LittleEndian'dır. Cihaz da öyleyse direkt çeviririz.
+            return BitConverter.GetBytes(value);
         }
 
         private double ConvertBytesToDouble(byte[] bytes)
@@ -389,20 +880,28 @@ namespace RehabilitationSystem.Communication
 
         private byte[] ConvertIntToBytes(int value)
         {
-            return null;
+            return BitConverter.GetBytes(value);
         }
 
         private void LogCommunication(string message, bool isError = false)
         {
-            // İletişim loglaması
+            // Konsola yazdır (İleride dosyaya yazdırma eklenebilir)
+            string prefix = isError ? "[ERROR]" : "[INFO]";
+            System.Diagnostics.Debug.WriteLine($"{DateTime.Now:HH:mm:ss} {prefix} {message}");
         }
 
+        // Dispose metodunu da dolduralım ki sınıf kapanırken port açık kalmasın
         public void Dispose()
         {
-            // Kaynakları temizleme
+            ClosePort();
+            if (_serialPort != null)
+            {
+                _serialPort.Dispose();
+                _serialPort = null;
+            }
         }
 
-       
+
     }
 
     #region Event Args Classes
