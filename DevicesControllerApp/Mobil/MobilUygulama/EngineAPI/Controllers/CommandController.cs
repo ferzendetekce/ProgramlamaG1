@@ -1,5 +1,4 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization; // Yetkilendirme için bu kütüphane gerekli.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RehabilitationSystem.EngineAPI.Services;
 
@@ -10,11 +9,6 @@ namespace RehabilitationSystem.EngineAPI.Controllers
     [Authorize]
     public class CommandController : ControllerBase
     {
-        /// <summary>
-        /// Mobil uygulamadan gelen tüm komutları tek bir noktadan işler ve ilgili servise yönlendirir.
-        /// </summary>
-        /// <param name="request">Gelen komut bilgisini içeren JSON modeli.</param>
-        /// <returns>İşlemin başarılı veya başarısız olduğunu belirten bir sonuç döner.</returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CommandRequest request)
         {
@@ -22,6 +16,7 @@ namespace RehabilitationSystem.EngineAPI.Controllers
             {
                 return BadRequest(new { status = "error", message = "Komut boş olamaz." });
             }
+
             var incomingCommand = request.Command.Trim().ToLower();
             Console.WriteLine($"Gelen komut: {incomingCommand}");
 
@@ -39,6 +34,7 @@ namespace RehabilitationSystem.EngineAPI.Controllers
                     "pause" => await Engine.Pause(),
                     "resume" => await Engine.Resume(),
                     "emergencystop" => await Engine.EmergencyStop(),
+                    "disconnect" => await Engine.Stop(),
                     "up" => await Engine.MoveUp(),
                     "down" => await Engine.MoveDown(),
                     "footincrease" => await Engine.FootIncrease(),
@@ -67,9 +63,6 @@ namespace RehabilitationSystem.EngineAPI.Controllers
         }
     }
 
-    /// <summary>
-    /// API'ye mobil uygulamadan gönderilen komut isteği için model.
-    /// </summary>
     public class CommandRequest
     {
         public string? Command { get; set; }

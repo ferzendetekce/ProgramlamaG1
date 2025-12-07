@@ -448,7 +448,7 @@ namespace RehabilitationSystem.Mobile
                 return "Devam ediyor";
             }
 
-            return "hazir";
+            return "Hazir";
         }
     }
 }

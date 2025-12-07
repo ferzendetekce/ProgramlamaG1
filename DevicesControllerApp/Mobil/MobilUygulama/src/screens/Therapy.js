@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ControlSection from '../components/ControlSection';
-import PButton from '../components/PButton';
 import statusService from '../services/statusService';
 
 const Therapy = ({ navigation }) => {
@@ -30,7 +29,7 @@ const Therapy = ({ navigation }) => {
 
   useEffect(() => {
     loadTherapy();
-    const intervalId = setInterval(loadTherapy, 10000);
+    const intervalId = setInterval(loadTherapy, 5000);
     return () => clearInterval(intervalId);
   }, [loadTherapy]);
 
@@ -115,10 +114,6 @@ const Therapy = ({ navigation }) => {
             </View>
           </>
         )}
-
-        <View style={{ marginTop: 12 }}>
-          <PButton onPress={loadTherapy} disabled={loading}>Yenile</PButton>
-        </View>
       </ControlSection>
     </Animated.View>
   );

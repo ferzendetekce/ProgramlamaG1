@@ -26,7 +26,6 @@ namespace RehabilitationSystem.EngineAPI.Services
         };
 
         public static string? LastError { get; private set; }
-        public static TherapySnapshot? LastSnapshot { get; private set; }
 
         private static async Task ConnectAsync()
         {
@@ -38,7 +37,10 @@ namespace RehabilitationSystem.EngineAPI.Services
                 }
 
                 client?.Dispose();
-                client = new TcpClient { NoDelay = true };
+                client = new TcpClient
+                {
+                    NoDelay = true
+                };
             }
 
             try
@@ -102,17 +104,7 @@ namespace RehabilitationSystem.EngineAPI.Services
 
             try
             {
-                var envelope = JsonSerializer.Deserialize<CommandEnvelope>(raw, serializerOptions);
-                if (envelope?.Therapy != null)
-                {
-                    LastSnapshot = envelope.Therapy;
-                }
-                else if (envelope != null)
-                {
-                    LastSnapshot = BuildFallbackSnapshot(command, LastSnapshot);
-                    envelope.Therapy = LastSnapshot;
-                }
-                return envelope;
+                return JsonSerializer.Deserialize<CommandEnvelope>(raw, serializerOptions);
             }
             catch (Exception ex)
             {
@@ -136,7 +128,6 @@ namespace RehabilitationSystem.EngineAPI.Services
         public static Task<CommandEnvelope?> BarDown(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("bardown", cancellationToken);
         public static Task<CommandEnvelope?> WeightIncrease(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("weightincrease", cancellationToken);
         public static Task<CommandEnvelope?> WeightDecrease(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("weightdecrease", cancellationToken);
-        public static Task<CommandEnvelope?> Disconnect(CancellationToken cancellationToken = default) => SendCommandForResponseAsync("disconnect", cancellationToken);
 
         public static async Task<bool> CheckConnectionAsync(CancellationToken cancellationToken = default)
         {
@@ -156,79 +147,6 @@ namespace RehabilitationSystem.EngineAPI.Services
             var envelope = await SendCommandForResponseAsync("status", cancellationToken);
             return envelope?.Therapy;
         }
-
-        private static TherapySnapshot BuildFallbackSnapshot(string command, TherapySnapshot? current)
-        {
-            var snapshot = current != null ? Clone(current) : new TherapySnapshot
-            {
-                PatientName = "Bilinmiyor",
-                TargetDurationMinutes = 30,
-                StartedAt = DateTime.UtcNow,
-                LastUpdate = DateTime.UtcNow
-            };
-
-            snapshot.LastUpdate = DateTime.UtcNow;
-            switch (command)
-            {
-                case "start":
-                    snapshot.StartedAt = DateTime.UtcNow;
-                    snapshot.IsRunning = true;
-                    snapshot.IsPaused = false;
-                    snapshot.IsEmergency = false;
-                    snapshot.LastCommand = "start";
-                    break;
-                case "stop":
-                    snapshot.IsRunning = false;
-                    snapshot.IsPaused = false;
-                    snapshot.IsEmergency = false;
-                    snapshot.LastCommand = "stop";
-                    break;
-                case "pause":
-                    snapshot.IsPaused = true;
-                    snapshot.IsRunning = true;
-                    snapshot.LastCommand = "pause";
-                    break;
-                case "resume":
-                    snapshot.IsPaused = false;
-                    snapshot.IsRunning = true;
-                    snapshot.LastCommand = "resume";
-                    break;
-                case "emergencystop":
-                    snapshot.IsEmergency = true;
-                    snapshot.IsRunning = false;
-                    snapshot.LastCommand = "emergencystop";
-                    break;
-                default:
-                    snapshot.LastCommand = command;
-                    break;
-            }
-
-            snapshot.StatusText = snapshot.IsEmergency
-                ? "ACIL STOP"
-                : snapshot.IsRunning
-                    ? (snapshot.IsPaused ? "Beklemede" : "Devam ediyor")
-                    : "Hazır";
-
-            return snapshot;
-        }
-
-        private static TherapySnapshot Clone(TherapySnapshot source)
-        {
-            return new TherapySnapshot
-            {
-                PatientName = source.PatientName,
-                IsRunning = source.IsRunning,
-                IsPaused = source.IsPaused,
-                IsEmergency = source.IsEmergency,
-                StartedAt = source.StartedAt,
-                LastUpdate = source.LastUpdate,
-                TargetDurationMinutes = source.TargetDurationMinutes,
-                WeightSupport = source.WeightSupport,
-                ShoeSize = source.ShoeSize,
-                SupportBarHeight = source.SupportBarHeight,
-                LastCommand = source.LastCommand,
-                StatusText = source.StatusText
-            };
-        }
     }
 }
+

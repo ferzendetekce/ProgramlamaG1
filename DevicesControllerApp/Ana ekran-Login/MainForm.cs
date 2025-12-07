@@ -26,9 +26,8 @@ namespace DevicesControllerApp
         private Label _lblWeight;
         private Label _lblShoe;
         private Label _lblSupport;
-        private Label _lblStatus;
+        private Label _lblLastCommand;
         private Panel _mobilePanel;
-        private ProgressBar _progressTherapy;
         private Label _lblElapsed;
         private Panel _chartPanel;
         private readonly Queue<int> _progressHistory = new Queue<int>();
@@ -57,9 +56,6 @@ namespace DevicesControllerApp
             splitContainer2.Panel2.Controls.Add(control);
         }
 
-        /// <summary>
-        /// Mobil komut sunucusunu ve durum göstergelerini kurar.
-        /// </summary>
         private void InitializeMobileBridge()
         {
             _mobileService = new MobileService();
@@ -81,8 +77,11 @@ namespace DevicesControllerApp
             _therapyTimer?.Dispose();
         }
 
-        private void MobileServer_CommandProcessed(object sender, string e) =>
-            UpdateTherapyStatus($"Son komut: {e}");
+        private void MobileServer_CommandProcessed(object sender, string e)
+        {
+            // Üst durum sadece terapi durumunu gösteriyor; komut bilgisi alt etikette.
+            UpdateTherapyStatus(BuildTherapyStatusText(_lastTherapyState));
+        }
 
         private void MobileServer_TherapyStateChanged(object sender, TherapySessionState e)
         {
@@ -104,7 +103,6 @@ namespace DevicesControllerApp
                 BeginInvoke(new Action(() => UpdateConnectionStatus(text)));
                 return;
             }
-
             _lblConnection.Text = text;
         }
 
@@ -115,7 +113,6 @@ namespace DevicesControllerApp
                 BeginInvoke(new Action(() => UpdateTherapyStatus(text)));
                 return;
             }
-
             _lblTherapy.Text = text;
         }
 
@@ -140,7 +137,6 @@ namespace DevicesControllerApp
             {
                 BuildMobilePanel();
             }
-
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(_mobilePanel);
         }
@@ -241,15 +237,17 @@ namespace DevicesControllerApp
         private void StopMobileStack()
         {
             _mobileService.StopAll();
+            _lastTherapyState = null;
             UpdateConnectionStatus("Mobil bağlantı: kapalı");
             _lblApi.Text = "EngineAPI: durduruldu";
             _lblTherapy.Text = "Terapi durumu: hazır";
-            _progressTherapy.Value = 0;
             _lblElapsed.Text = "Süre: 00:00 / 00:00";
             _lblWeight.Text = "Ağırlık Azaltma: -";
             _lblShoe.Text = "Ayak Numarası: -";
             _lblSupport.Text = "Destek Barı: -";
-            _lblStatus.Text = "Durum: hazır";
+            _lblLastCommand.Text = "Son Komut: -";
+            _progressHistory.Clear();
+            _chartPanel.Invalidate();
         }
 
         private void ShowDebugInfo()
@@ -303,7 +301,7 @@ namespace DevicesControllerApp
             var therapyPanel = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 220,
+                Height = 200,
                 BackColor = Color.White,
                 Padding = new Padding(12),
                 BorderStyle = BorderStyle.FixedSingle
@@ -315,15 +313,6 @@ namespace DevicesControllerApp
                 Font = new Font(FontFamily.GenericSansSerif, 11, FontStyle.Bold),
                 Dock = DockStyle.Top,
                 Height = 22
-            };
-
-            _progressTherapy = new ProgressBar
-            {
-                Dock = DockStyle.Top,
-                Height = 24,
-                Minimum = 0,
-                Maximum = 100,
-                Style = ProgressBarStyle.Continuous
             };
 
             _lblElapsed = new Label
@@ -350,15 +339,14 @@ namespace DevicesControllerApp
             _lblWeight = CreateInfoLabel("Ağırlık Azaltma: -");
             _lblShoe = CreateInfoLabel("Ayak Numarası: -");
             _lblSupport = CreateInfoLabel("Destek Barı: -");
-            _lblStatus = CreateInfoLabel("Durum: hazır");
+            _lblLastCommand = CreateInfoLabel("Son Komut: -");
 
             detailsPanel.Controls.Add(_lblWeight, 0, 0);
             detailsPanel.Controls.Add(_lblShoe, 1, 0);
             detailsPanel.Controls.Add(_lblSupport, 0, 1);
-            detailsPanel.Controls.Add(_lblStatus, 1, 1);
+            detailsPanel.Controls.Add(_lblLastCommand, 1, 1);
 
             therapyPanel.Controls.Add(_lblElapsed);
-            therapyPanel.Controls.Add(_progressTherapy);
             therapyPanel.Controls.Add(therapyTitle);
             therapyPanel.Controls.Add(detailsPanel);
 
@@ -390,14 +378,13 @@ namespace DevicesControllerApp
 
         private void UpdateTherapyProgress(TherapySessionState state)
         {
-            if (_progressTherapy == null || _lblElapsed == null)
+            if (_lblElapsed == null)
             {
                 return;
             }
 
             if (state == null || !state.StartedAt.HasValue || !state.LastUpdate.HasValue || state.TargetDurationMinutes <= 0)
             {
-                _progressTherapy.Value = 0;
                 _lblElapsed.Text = "Süre: 00:00 / 00:00";
                 return;
             }
@@ -409,42 +396,15 @@ namespace DevicesControllerApp
             }
 
             var target = TimeSpan.FromMinutes(state.TargetDurationMinutes);
-            var percent = target.TotalSeconds > 0
-                ? Math.Min(100, (int)((elapsed.TotalSeconds / target.TotalSeconds) * 100))
-                : 0;
-
-            _progressTherapy.Value = Math.Max(0, percent);
 
             var elapsedText = $"{(int)elapsed.TotalMinutes:00}:{elapsed.Seconds:00}";
             var targetText = $"{state.TargetDurationMinutes:00}:00";
             _lblElapsed.Text = $"Süre: {elapsedText} / {targetText}";
 
-            if (_lblWeight != null)
-            {
-                _lblWeight.Text = $"Ağırlık Azaltma: {Math.Round(state.WeightSupport, 1)} kg";
-            }
-
-            if (_lblShoe != null)
-            {
-                _lblShoe.Text = $"Ayak Numarası: {state.ShoeSize}";
-            }
-
-            if (_lblSupport != null)
-            {
-                _lblSupport.Text = $"Destek Barı: {state.SupportBarHeight:0.00} m";
-            }
-
-            if (_lblStatus != null)
-            {
-                _lblStatus.Text = $"Durum: {BuildTherapyStatusText(state)}";
-            }
-
-            if (_progressHistory.Count > 30)
-            {
-                _progressHistory.Dequeue();
-            }
-            _progressHistory.Enqueue(percent);
-            _chartPanel.Invalidate();
+            _lblWeight.Text = $"Ağırlık Azaltma: {Math.Round(state.WeightSupport, 1)} kg";
+            _lblShoe.Text = $"Ayak Numarası: {state.ShoeSize}";
+            _lblSupport.Text = $"Destek Barı: {state.SupportBarHeight:0.00} m";
+            _lblLastCommand.Text = $"Son Komut: {state.LastCommand}";
 
             _lastTherapyState = state;
         }
@@ -481,7 +441,12 @@ namespace DevicesControllerApp
 
         private void TherapyTimer_Tick(object sender, EventArgs e)
         {
-            if (_lastTherapyState != null && _lastTherapyState.StartedAt.HasValue && _lastTherapyState.TargetDurationMinutes > 0)
+            if (_lastTherapyState != null &&
+                _lastTherapyState.StartedAt.HasValue &&
+                _lastTherapyState.TargetDurationMinutes > 0 &&
+                _lastTherapyState.IsRunning &&
+                !_lastTherapyState.IsPaused &&
+                !_lastTherapyState.IsEmergency)
             {
                 _lastTherapyState.LastUpdate = DateTime.UtcNow;
                 UpdateTherapyProgress(_lastTherapyState);

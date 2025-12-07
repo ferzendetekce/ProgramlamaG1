@@ -119,12 +119,12 @@ const Remote = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#EEF2F7',
     padding: 16,
-    paddingTop: 24
+    paddingTop: 24,
+    backgroundColor: '#EEF2F7'
   },
   hostCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     padding: 14,
     borderRadius: 10,
     marginBottom: 14,
@@ -132,7 +132,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
-    elevation: 3
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E5E7EB'
   },
   hostTitle: {
     fontSize: 12,
