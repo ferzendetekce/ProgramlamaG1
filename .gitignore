@@ -433,3 +433,6 @@ DevicesControllerApp/DevicesControllerApp.csproj
 .vs/DevicesControllerApp/v17/DocumentLayout.json
 /DevicesControllerApp/obj/Debug
 /DevicesControllerApp/bin/Debug
+DevicesControllerApp/Mobil/MobilUygulama/android/app/debug.keystore
+DevicesControllerApp/Mobil/MobilUygulama/android/app/build.gradle
+/DevicesControllerApp/Mobil/MobilUygulama/android

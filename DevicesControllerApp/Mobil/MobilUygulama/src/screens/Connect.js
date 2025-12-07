@@ -10,6 +10,9 @@ const Connect = ({ navigation }) => {
   const [port, setPort] = useState("5086");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState('');
+  const [debugVisible, setDebugVisible] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
+  const [debugError, setDebugError] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -34,6 +37,18 @@ const Connect = ({ navigation }) => {
       Alert.alert("Bağlantı Hatası", err.message || "Sunucuya ulaşılamadı.");
     } finally {
       setChecking(false);
+    }
+  };
+
+  const handleDebugPing = async () => {
+    setDebugError('');
+    setDebugInfo('Ping atılıyor...');
+    try {
+      const res = await statusService.checkConnection(ip, port, 1000);
+      setDebugInfo(`Ping OK -> reachable: ${res.reachable ? "true" : "false"}`);
+    } catch (err) {
+      setDebugError(err.message || "Ping başarısız.");
+      setDebugInfo('');
     }
   };
 
@@ -80,6 +95,19 @@ const Connect = ({ navigation }) => {
         <PButton onPress={handleAutoDiscover} disabled={checking}>
           {checking ? <ActivityIndicator color="white" /> : "Otomatik Bul"}
         </PButton>
+        <View style={{ height: 10 }} />
+        <PButton onPress={() => setDebugVisible(!debugVisible)} disabled={checking} className="bg-slate-500">
+          {debugVisible ? "Debug Gizle" : "Debug Göster"}
+        </PButton>
+        {debugVisible ? (
+          <View style={styles.debugBox}>
+            <PButton onPress={handleDebugPing} disabled={checking} className="bg-cyan-600 mb-2">
+              {checking ? <ActivityIndicator color="white" /> : "Ping Testi"}
+            </PButton>
+            {debugInfo ? <Text style={styles.debugInfo}>{debugInfo}</Text> : null}
+            {debugError ? <Text style={styles.debugError}>{debugError}</Text> : null}
+          </View>
+        ) : null}
       </View>
     </Animated.View>
   );
@@ -116,6 +144,22 @@ const styles = StyleSheet.create({
     color: '#DC2626',
     marginBottom: 12,
     fontWeight: '600'
+  },
+  debugBox: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F8FAFC'
+  },
+  debugInfo: {
+    color: '#065F46',
+    fontWeight: '700'
+  },
+  debugError: {
+    color: '#B91C1C',
+    fontWeight: '700'
   }
 });
 

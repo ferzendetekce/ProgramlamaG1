@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DEFAULT_PORT = "5086";
 
-const fetchWithTimeout = async (url, options = {}, timeoutMs = 1200) => {
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 2500) => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -30,7 +30,7 @@ const getStoredHost = async () => {
   return raw ? JSON.parse(raw) : null;
 };
 
-const checkConnection = async (ip, port, timeoutMs = 1000) => {
+const checkConnection = async (ip, port, timeoutMs = 1500) => {
   const url = `http://${ip}:${port}/api/status/ping`;
   const response = await fetchWithTimeout(url, {}, timeoutMs);
   const data = await response.json();
@@ -48,7 +48,7 @@ const fetchTherapy = async () => {
   const url = `http://${host.ip}:${host.port}/api/status/therapy`;
   const response = await fetchWithTimeout(url, {
     headers: { Authorization: `Bearer ${token}` },
-  }, 1200);
+  }, 2500);
 
   const data = await response.json();
   if (response.status === 401) {
