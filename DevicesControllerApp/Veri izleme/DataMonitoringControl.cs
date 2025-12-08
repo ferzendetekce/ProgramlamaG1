@@ -120,7 +120,7 @@ namespace DevicesControllerApp.Veri_izleme
             area.AxisY.Maximum = 100;
         }
 
-        // ------------------ DATA UPDATE (20 FPS) ------------------
+        // ------------------ DATA UPDATE (20 FPS) -----------------
         private void Timer_Tick(object sender, EventArgs e)
         {
             double v1 = rnd.Next(10, 100);
