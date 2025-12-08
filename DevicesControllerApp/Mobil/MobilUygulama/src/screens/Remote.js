@@ -2,9 +2,10 @@ import { ScrollView, View, Text, Alert, StyleSheet, Animated, Easing } from 'rea
 import React, { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import remoteService from '../services/remoteService';
-import statusService from '../services/statusService';
 import ControlButton from '../components/ControlButton';
 import ControlSection from '../components/ControlSection';
+import PButton from '../components/PButton';
+import statusService from '../services/statusService';
 import {
   sendImmediateNotification,
   sendErrorNotification,
@@ -16,9 +17,6 @@ const Remote = ({ navigation }) => {
   const [isPaused, setIsPaused] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [errorText, setErrorText] = useState('');
-  const [debugVisible, setDebugVisible] = useState(false);
-  const [debugInfo, setDebugInfo] = useState('');
-  const [debugError, setDebugError] = useState('');
 
   useEffect(() => {
     const loadHost = async () => {
@@ -71,46 +69,6 @@ const Remote = ({ navigation }) => {
     } else {
       sendCommandWithNotification('pause', 'Terapi Bekletildi', 'Seans geçici olarak duraklatıldı.');
       setIsPaused(true);
-    }
-  };
-
-  const runDebugPing = async () => {
-    if (!host) {
-      Alert.alert('Hata', 'Sunucu bağlantı bilgileri bulunamadı.');
-      return;
-    }
-    setDebugError('');
-    setDebugInfo('Ping atılıyor...');
-    try {
-      const res = await statusService.checkConnection(host.ip, host.port, 1000);
-      setDebugInfo(`Ping OK -> reachable: ${res.reachable ? 'true' : 'false'}`);
-    } catch (err) {
-      setDebugError(err.message || 'Ping başarısız.');
-      setDebugInfo('');
-    }
-  };
-
-  const runDebugTherapy = async () => {
-    setDebugError('');
-    setDebugInfo('Terapi bilgisi alınıyor...');
-    try {
-      const therapy = await statusService.fetchTherapy();
-      setDebugInfo(`Terapi durum: ${therapy?.statusText || 'bilinmiyor'}`);
-    } catch (err) {
-      setDebugError(err.message || 'Terapi bilgisi alınamadı.');
-      setDebugInfo('');
-    }
-  };
-
-  const runDebugDisconnect = async () => {
-    setDebugError('');
-    setDebugInfo('Disconnect gönderiliyor...');
-    try {
-      await statusService.sendDisconnect();
-      setDebugInfo('Disconnect komutu gönderildi.');
-    } catch (err) {
-      setDebugError(err.message || 'Disconnect başarısız.');
-      setDebugInfo('');
     }
   };
 
@@ -216,29 +174,20 @@ const Remote = ({ navigation }) => {
         </View>
       </ControlSection>
 
-      <ControlSection title="Debug">
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 8 }}>
-          <ControlButton
-            onPress={() => setDebugVisible(!debugVisible)}
-            text={debugVisible ? 'Gizle' : 'Göster'}
-            colorClass="bg-slate-500"
-          />
-          {debugVisible ? (
-            <>
-              <ControlButton onPress={runDebugPing} text="Ping" colorClass="bg-cyan-600" />
-              <ControlButton onPress={runDebugTherapy} text="Terapi Durumu" colorClass="bg-emerald-600" />
-              <ControlButton onPress={runDebugDisconnect} text="Disconnect" colorClass="bg-rose-600" />
-            </>
-          ) : null}
-        </View>
-        {debugVisible ? (
-          <View style={styles.debugBox}>
-            <Text style={styles.debugLabel}>Host</Text>
-            <Text style={styles.debugValue}>{host ? `${host.ip}:${host.port}` : 'Bağlı değil'}</Text>
-            {debugInfo ? <Text style={styles.debugInfo}>{debugInfo}</Text> : null}
-            {debugError ? <Text style={styles.debugError}>{debugError}</Text> : null}
-          </View>
-        ) : null}
+      <ControlSection title="Bağlantı">
+        <PButton
+          onPress={async () => {
+            try {
+              await statusService.sendDisconnect();
+              Alert.alert('Bağlantı Kesildi', 'Sunucu bağlantısı sonlandırıldı.');
+              navigation.navigate('Connect');
+            } catch (e) {
+              Alert.alert('Hata', e.message || 'Bağlantı kesilemedi.');
+            }
+          }}
+        >
+          Bağlantıyı Kes
+        </PButton>
       </ControlSection>
     </Animated.ScrollView>
   );
@@ -290,33 +239,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#374151',
-  },
-  debugBox: {
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 8,
-  },
-  debugLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 2,
-  },
-  debugValue: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 8,
-  },
-  debugInfo: {
-    color: '#065F46',
-    fontWeight: '600',
-  },
-  debugError: {
-    color: '#B91C1C',
-    fontWeight: '600',
   },
 });
 

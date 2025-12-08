@@ -180,12 +180,14 @@ namespace RehabilitationSystem.Mobile
                         payload = new { message = "Acil durdurma tetiklendi" };
                         break;
                     case "up":
-                        _sessionState.MarkMovement("Vinç Yukarı");
-                        payload = new { message = "Vinç yukarı komutu alındı" };
+                        _sessionState.MarkMovement("Vinc Yukari");
+                        stateChanged = true;
+                        payload = new { message = "Vinc yukari komutu alindi" };
                         break;
                     case "down":
-                        _sessionState.MarkMovement("Vinç Aşağı");
-                        payload = new { message = "Vinç aşağı komutu alındı" };
+                        _sessionState.MarkMovement("Vinc Asagi");
+                        stateChanged = true;
+                        payload = new { message = "Vinc asagi komutu alindi" };
                         break;
                     case "left":
                         _sessionState.MarkMovement("Sola Hareket");
@@ -224,6 +226,12 @@ namespace RehabilitationSystem.Mobile
                         _sessionState.AdjustWeight(false);
                         stateChanged = true;
                         payload = new { message = "Ağırlık azaltma düşürüldü" };
+                        break;
+                    case "disconnect":
+                        _sessionState.Stop();
+                        stateChanged = true;
+                        payload = new { message = "Bağlantı kesildi" };
+                        OnClientDisconnected("disconnect");
                         break;
                     default:
                         return _serializer.Serialize(new
@@ -327,6 +335,8 @@ namespace RehabilitationSystem.Mobile
         public int ShoeSize { get; set; } = 42;
         public double SupportBarHeight { get; set; } = 0.4;
         public string LastCommand { get; set; } = "hazir";
+        public string StatusText { get; set; } = "Hazir";
+        public int CommandSerial { get; set; }
 
         public void Start()
         {
@@ -421,7 +431,8 @@ namespace RehabilitationSystem.Mobile
                 shoeSize = ShoeSize,
                 supportBarHeight = SupportBarHeight,
                 lastCommand = LastCommand,
-                statusText = BuildStatusText()
+                statusText = BuildStatusText(),
+                commandSerial = CommandSerial
             };
         }
 
@@ -429,6 +440,8 @@ namespace RehabilitationSystem.Mobile
         {
             LastCommand = command;
             LastUpdate = DateTime.UtcNow;
+            CommandSerial++;
+            StatusText = BuildStatusText();
         }
 
         private string BuildStatusText()

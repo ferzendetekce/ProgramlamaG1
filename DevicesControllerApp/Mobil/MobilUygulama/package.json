@@ -16,6 +16,7 @@
     "@react-navigation/native-stack": "^7.3.26",
     "@rn-primitives/slot": "^1.2.0",
     "expo": "~54.0.10",
+    "expo-network": "~6.0.0",
     "expo-device": "~8.0.9",
     "expo-notifications": "~0.32.12",
     "expo-status-bar": "~3.0.8",

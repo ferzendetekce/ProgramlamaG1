@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Network from "expo-network";
 
 const DEFAULT_PORT = "5086";
 
@@ -46,9 +47,13 @@ const fetchTherapy = async () => {
   const token = await getStoredToken();
 
   const url = `http://${host.ip}:${host.port}/api/status/therapy`;
-  const response = await fetchWithTimeout(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  }, 2500);
+  const response = await fetchWithTimeout(
+    url,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+    2500
+  );
 
   const data = await response.json();
   if (response.status === 401) {
@@ -62,19 +67,20 @@ const fetchTherapy = async () => {
   return data.therapy;
 };
 
-/**
- * Aynı subnet içinde (x.x.x.y) hızlı tarama yaparak ilk ulaşılabilen host'u döndürür.
- */
 const autoDiscover = async () => {
   const stored = await getStoredHost().catch(() => null);
-  const baseIp = (stored?.ip || "10.200.117.50").split(".");
-  if (baseIp.length !== 4) throw new Error("IP formatı hatalı.");
-  const subnet = `${baseIp[0]}.${baseIp[1]}.${baseIp[2]}`;
-  const start = Math.max(2, parseInt(baseIp[3], 10) - 5);
-  const end = Math.min(254, start + 20);
+  let subnet = null;
+  try {
+    const ip = await Network.getIpAddressAsync();
+    if (ip) {
+      const parts = ip.split(".");
+      if (parts.length === 4) subnet = `${parts[0]}.${parts[1]}.${parts[2]}`;
+    }
+  } catch {}
 
   const primary = [
     stored,
+    subnet ? { ip: `${subnet}.1`, port: DEFAULT_PORT } : null,
     { ip: "10.200.117.50", port: DEFAULT_PORT },
     { ip: "10.0.2.2", port: DEFAULT_PORT },
     { ip: "127.0.0.1", port: DEFAULT_PORT },
@@ -87,12 +93,27 @@ const autoDiscover = async () => {
     } catch {}
   }
 
-  for (let i = start; i <= end; i++) {
-    const candidate = { ip: `${subnet}.${i}`, port: DEFAULT_PORT };
-    try {
-      await checkConnection(candidate.ip, candidate.port, 700);
-      return candidate;
-    } catch {}
+  const candidates = [];
+  if (subnet) {
+    for (let i = 0; i <= 255; i++) {
+      candidates.push({ ip: `${subnet}.${i}`, port: DEFAULT_PORT });
+    }
+  }
+
+  for (let i = 0; i < candidates.length; i += 25) {
+    const batch = candidates.slice(i, i + 25);
+    const results = await Promise.all(
+      batch.map(async (c) => {
+        try {
+          await checkConnection(c.ip, c.port, 600);
+          return c;
+        } catch {
+          return null;
+        }
+      })
+    );
+    const found = results.find(Boolean);
+    if (found) return found;
   }
 
   throw new Error("Hiçbir aday IP'ye ulaşılamadı. Manuel giriniz.");
@@ -111,6 +132,7 @@ const sendDisconnect = async () => {
       },
       body: JSON.stringify({ command: "disconnect" }),
     }, 700);
+    await AsyncStorage.removeItem("apiHost");
   } catch (err) {
     console.warn("Disconnect isteği gönderilemedi:", err.message);
   }

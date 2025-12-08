@@ -19,7 +19,7 @@ namespace DevicesControllerApp
         private FlowLayoutPanel _mobileToolbar;
         private Button _btnStartApi;
         private Button _btnStopApi;
-        private Button _btnDebug;
+        private Button _btnDisconnect;
         private Label _lblConnection;
         private Label _lblTherapy;
         private Label _lblApi;
@@ -27,12 +27,21 @@ namespace DevicesControllerApp
         private Label _lblShoe;
         private Label _lblSupport;
         private Label _lblLastCommand;
+        private Panel _winchPanel;
         private Panel _mobilePanel;
         private Label _lblElapsed;
         private Panel _chartPanel;
         private readonly Queue<int> _progressHistory = new Queue<int>();
+        private readonly Random _rand = new Random();
+        private double _winchPosition = 50;
+        private int _lastWinchSerial = -1;
         private Timer _therapyTimer;
         private TherapySessionState _lastTherapyState;
+
+        private NumericUpDown _numTargetMinutes;
+        private NumericUpDown _numWeightInput;
+        private NumericUpDown _numShoeInput;
+        private NumericUpDown _numSupportInput;
 
         public MainForm()
         {
@@ -79,8 +88,11 @@ namespace DevicesControllerApp
 
         private void MobileServer_CommandProcessed(object sender, string e)
         {
-            // Üst durum sadece terapi durumunu gösteriyor; komut bilgisi alt etikette.
             UpdateTherapyStatus(BuildTherapyStatusText(_lastTherapyState));
+            if (!string.IsNullOrEmpty(e) && e.ToLowerInvariant().Contains("disconnect"))
+            {
+                UpdateConnectionStatus("Mobil baglanti: kapali", false);
+            }
         }
 
         private void MobileServer_TherapyStateChanged(object sender, TherapySessionState e)
@@ -91,19 +103,20 @@ namespace DevicesControllerApp
         }
 
         private void MobileServer_ClientDisconnected(object sender, string e) =>
-            UpdateConnectionStatus("Mobil bağlantı: kapalı");
+            UpdateConnectionStatus("Mobil baglanti: kapali", false);
 
         private void MobileServer_ClientConnected(object sender, string e) =>
-            UpdateConnectionStatus($"Mobil bağlantı: {e}");
+            UpdateConnectionStatus($"Mobil baglanti: {e}", true);
 
-        private void UpdateConnectionStatus(string text)
+        private void UpdateConnectionStatus(string text, bool connected = false)
         {
             if (InvokeRequired)
             {
-                BeginInvoke(new Action(() => UpdateConnectionStatus(text)));
+                BeginInvoke(new Action(() => UpdateConnectionStatus(text, connected)));
                 return;
             }
             _lblConnection.Text = text;
+            _lblConnection.ForeColor = connected ? Color.ForestGreen : Color.Maroon;
         }
 
         private void UpdateTherapyStatus(string text)
@@ -126,7 +139,7 @@ namespace DevicesControllerApp
                 return "Terapi durumu: beklemede";
             if (state.IsRunning)
                 return "Terapi durumu: devam ediyor";
-            return "Terapi durumu: hazır";
+            return "Terapi durumu: hazir";
         }
 
         private void BtnMobile_Click(object sender, EventArgs e) => ShowMobilePanel();
@@ -154,12 +167,15 @@ namespace DevicesControllerApp
 
             _btnStartApi = new Button
             {
-                Text = "API Başlat",
+                Text = "API Baslat",
                 Width = 110,
                 Height = 35,
                 BackColor = Color.LightGreen
             };
-            _btnStartApi.Click += (s, e) => StartMobileStack();
+            _btnStartApi.Click += (s, e) =>
+            {
+                StartMobileStack();
+            };
 
             _btnStopApi = new Button
             {
@@ -170,18 +186,18 @@ namespace DevicesControllerApp
             };
             _btnStopApi.Click += (s, e) => StopMobileStack();
 
-            _btnDebug = new Button
+            _btnDisconnect = new Button
             {
-                Text = "Debug",
-                Width = 90,
+                Text = "Baglantiyi Kes",
+                Width = 120,
                 Height = 35,
-                BackColor = Color.LightYellow
+                BackColor = Color.LightGray
             };
-            _btnDebug.Click += (s, e) => ShowDebugInfo();
+            _btnDisconnect.Click += (s, e) => StopMobileStack();
 
             _lblConnection = new Label
             {
-                Text = "Mobil bağlantı: kapalı",
+                Text = "Mobil baglanti: kapali",
                 AutoSize = true,
                 Padding = new Padding(10, 8, 0, 0),
                 Font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold)
@@ -189,7 +205,7 @@ namespace DevicesControllerApp
 
             _lblTherapy = new Label
             {
-                Text = "Terapi durumu: hazır",
+                Text = "Terapi durumu: hazir",
                 AutoSize = true,
                 Padding = new Padding(10, 8, 0, 0),
                 Font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold)
@@ -197,7 +213,7 @@ namespace DevicesControllerApp
 
             _lblApi = new Label
             {
-                Text = "EngineAPI: kapalı",
+                Text = "EngineAPI: kapali",
                 AutoSize = true,
                 Padding = new Padding(10, 8, 0, 0),
                 Font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Bold)
@@ -205,7 +221,7 @@ namespace DevicesControllerApp
 
             _mobileToolbar.Controls.Add(_btnStartApi);
             _mobileToolbar.Controls.Add(_btnStopApi);
-            _mobileToolbar.Controls.Add(_btnDebug);
+            _mobileToolbar.Controls.Add(_btnDisconnect);
             _mobileToolbar.Controls.Add(_lblConnection);
             _mobileToolbar.Controls.Add(_lblTherapy);
             _mobileToolbar.Controls.Add(_lblApi);
@@ -217,20 +233,20 @@ namespace DevicesControllerApp
             {
                 if (_mobileService.StartAll(out var error))
                 {
-                    UpdateConnectionStatus("Mobil bağlantı: dinleniyor");
-                    _lblTherapy.Text = "Terapi durumu: hazır";
-                    _lblApi.Text = $"EngineAPI: {_mobileService.ApiHost.Port} (çalışıyor)";
+                    UpdateConnectionStatus("Mobil baglanti: dinleniyor", false);
+                    _lblTherapy.Text = "Terapi durumu: hazir";
+                    _lblApi.Text = $"EngineAPI: {_mobileService.ApiHost.Port} (calisiyor)";
                 }
                 else
                 {
                     _lblApi.Text = $"EngineAPI: hata ({error})";
-                    MessageBox.Show(error, "EngineAPI Başlatılamadı", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(error, "EngineAPI baslatilamadi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
                 _lblApi.Text = $"EngineAPI: hata ({ex.Message})";
-                MessageBox.Show(ex.Message, "EngineAPI Başlatılamadı", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "EngineAPI baslatilamadi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -238,22 +254,91 @@ namespace DevicesControllerApp
         {
             _mobileService.StopAll();
             _lastTherapyState = null;
-            UpdateConnectionStatus("Mobil bağlantı: kapalı");
+            UpdateConnectionStatus("Mobil baglanti: kapali", false);
             _lblApi.Text = "EngineAPI: durduruldu";
-            _lblTherapy.Text = "Terapi durumu: hazır";
-            _lblElapsed.Text = "Süre: 00:00 / 00:00";
-            _lblWeight.Text = "Ağırlık Azaltma: -";
-            _lblShoe.Text = "Ayak Numarası: -";
-            _lblSupport.Text = "Destek Barı: -";
+            _lblTherapy.Text = "Terapi durumu: hazir";
+            _lblElapsed.Text = "Sure: 00:00 / 00:00";
+            _lblWeight.Text = "Agirlik Azaltma: -";
+            _lblShoe.Text = "Ayak Numarasi: -";
+            _lblSupport.Text = "Destek Bari: -";
             _lblLastCommand.Text = "Son Komut: -";
             _progressHistory.Clear();
             _chartPanel.Invalidate();
         }
 
-        private void ShowDebugInfo()
+        private Panel BuildTherapySetupPanel()
         {
-            var info = $"API Portu: {_mobileService.ApiHost.Port}\nKomut Sunucusu: {_mobileService.CommandServer?.IsRunning}\nDiscovery: {_mobileService.DiscoveryServer?.IsRunning}\nSon Hata: {_mobileService.ApiHost.LastError}";
-            MessageBox.Show(info, "Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var setupPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 120,
+                BackColor = Color.White,
+                Padding = new Padding(8),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            var grid = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 4,
+                RowCount = 2
+            };
+            for (int i = 0; i < 4; i++)
+                grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
+            grid.RowStyles.Add(new RowStyle(SizeType.Percent, 60));
+            grid.RowStyles.Add(new RowStyle(SizeType.Percent, 40));
+
+            _numTargetMinutes = new NumericUpDown
+            {
+                Minimum = 5,
+                Maximum = 180,
+                Value = 30,
+                DecimalPlaces = 0,
+                Dock = DockStyle.Fill
+            };
+            _numWeightInput = new NumericUpDown
+            {
+                Minimum = 0,
+                Maximum = 150,
+                DecimalPlaces = 0,
+                Increment = 1M,
+                Value = 20,
+                Dock = DockStyle.Fill
+            };
+            _numShoeInput = new NumericUpDown
+            {
+                Minimum = 20,
+                Maximum = 50,
+                Value = 42,
+                Dock = DockStyle.Fill
+            };
+            _numSupportInput = new NumericUpDown
+            {
+                Minimum = 0,
+                Maximum = 200,
+                DecimalPlaces = 2,
+                Increment = 0.05M,
+                Value = 0.40M,
+                Dock = DockStyle.Fill
+            };
+
+            grid.Controls.Add(new Label { Text = "Sure (dk)", Dock = DockStyle.Fill, TextAlign = ContentAlignment.BottomLeft }, 0, 0);
+            grid.Controls.Add(new Label { Text = "Agirlik Azaltma (kg)", Dock = DockStyle.Fill, TextAlign = ContentAlignment.BottomLeft }, 1, 0);
+            grid.Controls.Add(new Label { Text = "Ayak No", Dock = DockStyle.Fill, TextAlign = ContentAlignment.BottomLeft }, 2, 0);
+            grid.Controls.Add(new Label { Text = "Destek Bari (m)", Dock = DockStyle.Fill, TextAlign = ContentAlignment.BottomLeft }, 3, 0);
+
+            grid.Controls.Add(_numTargetMinutes, 0, 1);
+            grid.Controls.Add(_numWeightInput, 1, 1);
+            grid.Controls.Add(_numShoeInput, 2, 1);
+            grid.Controls.Add(_numSupportInput, 3, 1);
+
+            _numTargetMinutes.ValueChanged += (s, e) => UpdatePresetLabels();
+            _numWeightInput.ValueChanged += (s, e) => UpdatePresetLabels();
+            _numShoeInput.ValueChanged += (s, e) => UpdatePresetLabels();
+            _numSupportInput.ValueChanged += (s, e) => UpdatePresetLabels();
+
+            setupPanel.Controls.Add(grid);
+            return setupPanel;
         }
 
         private void BuildMobilePanel()
@@ -298,6 +383,8 @@ namespace DevicesControllerApp
             };
             statusPanel.Controls.Add(_mobileToolbar);
 
+            var setupPanel = BuildTherapySetupPanel();
+
             var therapyPanel = new Panel
             {
                 Dock = DockStyle.Top,
@@ -309,7 +396,7 @@ namespace DevicesControllerApp
 
             var therapyTitle = new Label
             {
-                Text = "Terapi Süreci",
+                Text = "Terapi Sureci",
                 Font = new Font(FontFamily.GenericSansSerif, 11, FontStyle.Bold),
                 Dock = DockStyle.Top,
                 Height = 22
@@ -317,7 +404,7 @@ namespace DevicesControllerApp
 
             _lblElapsed = new Label
             {
-                Text = "Süre: 00:00 / 00:00",
+                Text = "Sure: 00:00 / 00:00",
                 Dock = DockStyle.Top,
                 Height = 20,
                 Padding = new Padding(0, 6, 0, 0)
@@ -336,9 +423,9 @@ namespace DevicesControllerApp
             detailsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 33));
             detailsPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 34));
 
-            _lblWeight = CreateInfoLabel("Ağırlık Azaltma: -");
-            _lblShoe = CreateInfoLabel("Ayak Numarası: -");
-            _lblSupport = CreateInfoLabel("Destek Barı: -");
+            _lblWeight = CreateInfoLabel("Agirlik Azaltma: -");
+            _lblShoe = CreateInfoLabel("Ayak Numarasi: -");
+            _lblSupport = CreateInfoLabel("Destek Bari: -");
             _lblLastCommand = CreateInfoLabel("Son Komut: -");
 
             detailsPanel.Controls.Add(_lblWeight, 0, 0);
@@ -361,7 +448,7 @@ namespace DevicesControllerApp
 
             var chartTitle = new Label
             {
-                Text = "Son Terapiler İlerleme Grafiği",
+                Text = "Son Terapiler Ilerleme Grafigi",
                 Dock = DockStyle.Top,
                 Height = 22,
                 Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Bold)
@@ -369,7 +456,9 @@ namespace DevicesControllerApp
             _chartPanel.Controls.Add(chartTitle);
 
             card.Controls.Add(_chartPanel);
+            card.Controls.Add(BuildWinchPanel());
             card.Controls.Add(therapyPanel);
+            card.Controls.Add(setupPanel);
             card.Controls.Add(statusPanel);
 
             _mobilePanel.Controls.Add(card);
@@ -385,7 +474,8 @@ namespace DevicesControllerApp
 
             if (state == null || !state.StartedAt.HasValue || !state.LastUpdate.HasValue || state.TargetDurationMinutes <= 0)
             {
-                _lblElapsed.Text = "Süre: 00:00 / 00:00";
+                _lblElapsed.Text = "Sure: 00:00 / 00:00";
+                _lblLastCommand.Text = "Son Komut: -";
                 return;
             }
 
@@ -399,12 +489,23 @@ namespace DevicesControllerApp
 
             var elapsedText = $"{(int)elapsed.TotalMinutes:00}:{elapsed.Seconds:00}";
             var targetText = $"{state.TargetDurationMinutes:00}:00";
-            _lblElapsed.Text = $"Süre: {elapsedText} / {targetText}";
+            _lblElapsed.Text = $"Sure: {elapsedText} / {targetText}";
 
-            _lblWeight.Text = $"Ağırlık Azaltma: {Math.Round(state.WeightSupport, 1)} kg";
-            _lblShoe.Text = $"Ayak Numarası: {state.ShoeSize}";
-            _lblSupport.Text = $"Destek Barı: {state.SupportBarHeight:0.00} m";
+            _lblWeight.Text = $"Agirlik Azaltma: {Math.Round(state.WeightSupport, 1)} kg";
+            _lblShoe.Text = $"Ayak Numarasi: {state.ShoeSize}";
+            _lblSupport.Text = $"Destek Bari: {state.SupportBarHeight:0.00} m";
             _lblLastCommand.Text = $"Son Komut: {state.LastCommand}";
+
+            var percent = _rand.Next(0, 101);
+
+            UpdateWinchDemo(state);
+
+            _progressHistory.Enqueue(percent);
+            while (_progressHistory.Count > 20)
+            {
+                _progressHistory.Dequeue();
+            }
+            _chartPanel.Invalidate();
 
             _lastTherapyState = state;
         }
@@ -462,6 +563,87 @@ namespace DevicesControllerApp
                 Font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Regular),
                 Padding = new Padding(0, 4, 0, 0)
             };
+        }
+
+        private void UpdatePresetLabels()
+        {
+            _lblWeight.Text = $"Agirlik Azaltma: {_numWeightInput.Value:0.0} kg";
+            _lblShoe.Text = $"Ayak Numarasi: {(int)_numShoeInput.Value}";
+            _lblSupport.Text = $"Destek Bari: {_numSupportInput.Value:0.00} m";
+            _lblElapsed.Text = $"Sure: 00:00 / {_numTargetMinutes.Value:00}:00";
+            if (_lastTherapyState != null)
+            {
+                _lastTherapyState.TargetDurationMinutes = (int)_numTargetMinutes.Value;
+                _lastTherapyState.WeightSupport = (double)_numWeightInput.Value;
+                _lastTherapyState.ShoeSize = (int)_numShoeInput.Value;
+                _lastTherapyState.SupportBarHeight = (double)_numSupportInput.Value;
+            }
+        }
+
+        private void UpdateWinchDemo(TherapySessionState state)
+        {
+            if (state == null || string.IsNullOrWhiteSpace(state.LastCommand))
+            {
+                return;
+            }
+
+            if (state.CommandSerial <= _lastWinchSerial)
+            {
+                return;
+            }
+
+            var cmd = state.LastCommand.ToLowerInvariant();
+            if (cmd.Contains("yukari"))
+            {
+                _winchPosition = Math.Min(100, _winchPosition + 5);
+            }
+            else if (cmd.Contains("asagi") || cmd.Contains("aşa") || cmd.Contains("aYa"))
+            {
+                _winchPosition = Math.Max(0, _winchPosition - 5);
+            }
+
+            _lastWinchSerial = state.CommandSerial;
+            _winchPanel?.Invalidate();
+        }
+
+        private Panel BuildWinchPanel()
+        {
+            _winchPanel = new Panel
+            {
+                Dock = DockStyle.Right,
+                Width = 140,
+                BackColor = Color.White,
+                Padding = new Padding(6),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            _winchPanel.Paint += WinchPanel_Paint;
+            return _winchPanel;
+        }
+
+        private void WinchPanel_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.Clear(Color.White);
+            var bounds = _winchPanel.ClientRectangle;
+            bounds.Inflate(-8, -8);
+            var rail = new Rectangle(bounds.Left + bounds.Width / 2 - 8, bounds.Top, 16, bounds.Height);
+            using (var railPen = new Pen(Color.LightGray, 3))
+            {
+                g.DrawLine(railPen, rail.Left + rail.Width / 2, rail.Top, rail.Left + rail.Width / 2, rail.Bottom);
+            }
+
+            var figureHeight = 30;
+            var y = bounds.Bottom - (int)(_winchPosition / 100f * bounds.Height) - figureHeight;
+            var figRect = new Rectangle(rail.Left - 12, y, rail.Width + 24, figureHeight);
+            using (var bodyBrush = new SolidBrush(Color.SteelBlue))
+            {
+                g.FillRectangle(bodyBrush, figRect);
+            }
+            using (var textBrush = new SolidBrush(Color.Black))
+            using (var font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Bold))
+            {
+                g.DrawString("Vinc", font, textBrush, figRect.Left, figRect.Top - 14);
+            }
         }
     }
 }
