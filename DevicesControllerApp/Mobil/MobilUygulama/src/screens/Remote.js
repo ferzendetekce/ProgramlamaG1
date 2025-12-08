@@ -4,8 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import remoteService from '../services/remoteService';
 import ControlButton from '../components/ControlButton';
 import ControlSection from '../components/ControlSection';
-import PButton from '../components/PButton';
-import statusService from '../services/statusService';
 import {
   sendImmediateNotification,
   sendErrorNotification,
@@ -41,7 +39,7 @@ const Remote = ({ navigation }) => {
 
   const sendCommandWithNotification = async (command, notificationTitle, notificationBody) => {
     if (!host) {
-      Alert.alert('Hata', 'Sunucu bağlantı bilgileri bulunamadı.');
+      Alert.alert('Hata', 'Sunucu baglanti bilgileri bulunamadi.');
       return;
     }
     try {
@@ -49,11 +47,11 @@ const Remote = ({ navigation }) => {
       sendImmediateNotification(notificationTitle, notificationBody);
       setErrorText('');
     } catch (error) {
-      console.error(`'${command}' komutu gönderilirken hata:`, error);
-      sendErrorNotification('Cihaza komut gönderilemedi.');
+      console.error(`'${command}' komutu gonderilirken hata:`, error);
+      sendErrorNotification('Cihaza komut gonderilemedi.');
       setErrorText(error.message || 'Bilinmeyen hata');
       if (error.status === 401) {
-        Alert.alert('Oturum Hatası', 'Oturumunuzun süresi dolmuş olabilir. Lütfen tekrar giriş yapın.', [
+        Alert.alert('Oturum Hatasi', 'Oturumunuzun suresi dolmus olabilir. Lutfen tekrar giris yapin.', [
           { text: 'Tamam', onPress: () => navigation.replace('Login') },
         ]);
       } else {
@@ -64,10 +62,10 @@ const Remote = ({ navigation }) => {
 
   const handlePauseResume = () => {
     if (isPaused) {
-      sendCommandWithNotification('resume', 'Terapi Devam Ediyor', 'Seans kaldığı yerden devam ettirildi.');
+      sendCommandWithNotification('resume', 'Terapi Devam Ediyor', 'Seans kaldigi yerden devam ettirildi.');
       setIsPaused(false);
     } else {
-      sendCommandWithNotification('pause', 'Terapi Bekletildi', 'Seans geçici olarak duraklatıldı.');
+      sendCommandWithNotification('pause', 'Terapi Bekletildi', 'Seans gecici olarak duraklatildi.');
       setIsPaused(true);
     }
   };
@@ -75,25 +73,28 @@ const Remote = ({ navigation }) => {
   return (
     <Animated.ScrollView
       contentContainerStyle={styles.container}
-      style={{ opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}
+      style={{
+        opacity: fadeAnim,
+        transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
+      }}
     >
       <View style={styles.hostCard}>
         <Text style={styles.hostTitle}>Sunucu</Text>
-        <Text style={styles.hostValue}>{host ? `${host.ip}:${host.port}` : 'Bağlı değil'}</Text>
+        <Text style={styles.hostValue}>{host ? `${host.ip}:${host.port}` : 'Bagli degil'}</Text>
       </View>
 
       <ControlSection title="Terapi Kontrolleri">
         {errorText ? <Text style={styles.inlineError}>{errorText}</Text> : null}
         <View style={styles.rowWrap}>
           <ControlButton
-            onPress={() => sendCommandWithNotification('start', 'Terapi Başlatıldı', 'Yeni bir terapi seansı başladı.')}
-            text="Başlat"
+            onPress={() => sendCommandWithNotification('start', 'Terapi Baslatildi', 'Yeni bir terapi seansi baslatildi.')}
+            text="Baslat"
             colorClass="bg-emerald-500"
           />
           <ControlButton onPress={handlePauseResume} text={isPaused ? 'Devam' : 'Beklet'} colorClass="bg-amber-500" />
           <ControlButton
             onPress={() => {
-              sendCommandWithNotification('stop', 'Terapi Durduruldu', 'Terapi seansı sonlandırıldı.');
+              sendCommandWithNotification('stop', 'Terapi Durduruldu', 'Terapi seansi sonlandirildi.');
               cancelAllNotifications();
             }}
             text="Durdur"
@@ -101,7 +102,7 @@ const Remote = ({ navigation }) => {
           />
           <ControlButton
             onPress={() => {
-              sendCommandWithNotification('emergencystop', 'ACİL DURUM', 'Tüm sistemler acil durum modunda durduruldu!');
+              sendCommandWithNotification('emergencystop', 'ACIL DURUM', 'Tum sistemler acil durum modunda durduruldu!');
               cancelAllNotifications();
             }}
             text="Acil Stop"
@@ -110,33 +111,33 @@ const Remote = ({ navigation }) => {
         </View>
       </ControlSection>
 
-      <ControlSection title="Vinç Kontrolleri">
+      <ControlSection title="Vinc Kontrolleri">
         <ControlButton
-          onPress={() => sendCommandWithNotification('up', 'Vinç Kontrolü', 'Vinç yukarı hareket ettirildi.')}
+          onPress={() => sendCommandWithNotification('up', 'Vinc Kontrolu', 'Vinc yukari hareket ettirildi.')}
           icon="arrow-up"
           colorClass="bg-indigo-500"
           size="large"
         />
         <View style={{ height: 20 }} />
         <ControlButton
-          onPress={() => sendCommandWithNotification('down', 'Vinç Kontrolü', 'Vinç aşağı hareket ettirildi.')}
+          onPress={() => sendCommandWithNotification('down', 'Vinc Kontrolu', 'Vinc asagi hareket ettirildi.')}
           icon="arrow-down"
           colorClass="bg-indigo-500"
           size="large"
         />
       </ControlSection>
 
-      <ControlSection title="Cihaz Ayarları">
+      <ControlSection title="Cihaz Ayarlari">
         <View style={styles.settingsRow}>
           <ControlButton
-            onPress={() => sendCommandWithNotification('footdecrease', 'Ayar Değişikliği', 'Ayak numarası küçültüldü.')}
+            onPress={() => sendCommandWithNotification('footdecrease', 'Ayar Degisikligi', 'Ayak numarasi kucultuldu.')}
             icon="remove"
             colorClass="bg-gray-300"
             textClass="text-black"
           />
-          <Text style={styles.settingLabel}>Ayak Numarası</Text>
+          <Text style={styles.settingLabel}>Ayak Numarasi</Text>
           <ControlButton
-            onPress={() => sendCommandWithNotification('footincrease', 'Ayar Değişikliği', 'Ayak numarası büyütüldü.')}
+            onPress={() => sendCommandWithNotification('footincrease', 'Ayar Degisikligi', 'Ayak numarasi buyutuldu.')}
             icon="add"
             colorClass="bg-gray-300"
             textClass="text-black"
@@ -144,14 +145,14 @@ const Remote = ({ navigation }) => {
         </View>
         <View style={styles.settingsRow}>
           <ControlButton
-            onPress={() => sendCommandWithNotification('bardown', 'Ayar Değişikliği', 'Destek barı alçaltıldı.')}
+            onPress={() => sendCommandWithNotification('bardown', 'Ayar Degisikligi', 'Destek barı asagi cekildi.')}
             icon="remove"
             colorClass="bg-gray-300"
             textClass="text-black"
           />
-          <Text style={styles.settingLabel}>Destek Barı</Text>
+          <Text style={styles.settingLabel}>Destek Bari</Text>
           <ControlButton
-            onPress={() => sendCommandWithNotification('barup', 'Ayar Değişikliği', 'Destek barı yükseltildi.')}
+            onPress={() => sendCommandWithNotification('barup', 'Ayar Degisikligi', 'Destek barı yukari cekildi.')}
             icon="add"
             colorClass="bg-gray-300"
             textClass="text-black"
@@ -159,35 +160,19 @@ const Remote = ({ navigation }) => {
         </View>
         <View style={styles.settingsRow}>
           <ControlButton
-            onPress={() => sendCommandWithNotification('weightdecrease', 'Ayar Değişikliği', 'Ağırlık azaltma düşürüldü.')}
+            onPress={() => sendCommandWithNotification('weightdecrease', 'Ayar Degisikligi', 'Agirlik azaltma dusuruldu.')}
             icon="remove"
             colorClass="bg-gray-300"
             textClass="text-black"
           />
-          <Text style={styles.settingLabel}>Ağırlık Azaltma</Text>
+          <Text style={styles.settingLabel}>Agirlik Azaltma</Text>
           <ControlButton
-            onPress={() => sendCommandWithNotification('weightincrease', 'Ayar Değişikliği', 'Ağırlık azaltma artırıldı.')}
+            onPress={() => sendCommandWithNotification('weightincrease', 'Ayar Degisikligi', 'Agirlik azaltma artirildi.')}
             icon="add"
             colorClass="bg-gray-300"
             textClass="text-black"
           />
         </View>
-      </ControlSection>
-
-      <ControlSection title="Bağlantı">
-        <PButton
-          onPress={async () => {
-            try {
-              await statusService.sendDisconnect();
-              Alert.alert('Bağlantı Kesildi', 'Sunucu bağlantısı sonlandırıldı.');
-              navigation.navigate('Connect');
-            } catch (e) {
-              Alert.alert('Hata', e.message || 'Bağlantı kesilemedi.');
-            }
-          }}
-        >
-          Bağlantıyı Kes
-        </PButton>
       </ControlSection>
     </Animated.ScrollView>
   );
@@ -227,6 +212,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+  },
+  inlineError: {
+    color: '#DC2626',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   settingsRow: {
     flexDirection: 'row',

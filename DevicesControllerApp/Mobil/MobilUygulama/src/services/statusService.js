@@ -19,7 +19,7 @@ const fetchWithTimeout = async (url, options = {}, timeoutMs = 2500) => {
 const getStoredToken = async () => {
   const token = await AsyncStorage.getItem("authToken");
   if (!token) {
-    const err = new Error("Oturum doğrulaması bulunamadı.");
+    const err = new Error("Oturum dogrulamasi bulunamadi.");
     err.status = 401;
     throw err;
   }
@@ -36,14 +36,14 @@ const checkConnection = async (ip, port, timeoutMs = 1500) => {
   const response = await fetchWithTimeout(url, {}, timeoutMs);
   const data = await response.json();
   if (!response.ok || data.status !== "ok") {
-    throw new Error(data.message || "Sunucuya ulaşılamadı.");
+    throw new Error(data.message || "Sunucuya ulasilamadi.");
   }
   return data;
 };
 
 const fetchTherapy = async () => {
   const host = await getStoredHost();
-  if (!host) throw new Error("Sunucu ayarı bulunamadı.");
+  if (!host) throw new Error("Sunucu ayari bulunamadi.");
   const token = await getStoredToken();
 
   const url = `http://${host.ip}:${host.port}/api/status/therapy`;
@@ -57,12 +57,12 @@ const fetchTherapy = async () => {
 
   const data = await response.json();
   if (response.status === 401) {
-    const err = new Error("Oturumunuzun süresi doldu.");
+    const err = new Error("Oturumunuzun suresi doldu.");
     err.status = 401;
     throw err;
   }
   if (!response.ok || data.status !== "ok") {
-    throw new Error(data.message || "Terapi bilgisi alınamadı.");
+    throw new Error(data.message || "Terapi bilgisi alinmadi.");
   }
   return data.therapy;
 };
@@ -116,31 +116,11 @@ const autoDiscover = async () => {
     if (found) return found;
   }
 
-  throw new Error("Hiçbir aday IP'ye ulaşılamadı. Manuel giriniz.");
-};
-
-const sendDisconnect = async () => {
-  const host = await getStoredHost();
-  if (!host) return;
-  try {
-    const token = await getStoredToken();
-    await fetchWithTimeout(`http://${host.ip}:${host.port}/api/Command`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ command: "disconnect" }),
-    }, 700);
-    await AsyncStorage.removeItem("apiHost");
-  } catch (err) {
-    console.warn("Disconnect isteği gönderilemedi:", err.message);
-  }
+  throw new Error("Hicbir aday IP'ye ulasilamadi. Manuel giriniz.");
 };
 
 export default {
   checkConnection,
   fetchTherapy,
   autoDiscover,
-  sendDisconnect,
 };

@@ -1,15 +1,13 @@
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import PInput from '../components/PInput';
 import PButton from '../components/PButton';
-import statusService from '../services/statusService';
-
 import authService from '../services/authService';
 
 const Login = ({ navigation }) => {
-  const [username, setUsername] = useState("grup11");
-  const [password, setPassword] = useState("12345");
+  const [username, setUsername] = useState('grup11');
+  const [password, setPassword] = useState('12345');
   const [host, setHost] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,17 +15,17 @@ const Login = ({ navigation }) => {
   useEffect(() => {
     const loadHost = async () => {
       try {
-        const storedHost = await AsyncStorage.getItem("apiHost");
+        const storedHost = await AsyncStorage.getItem('apiHost');
         if (storedHost) {
           const parsedHost = JSON.parse(storedHost);
           setHost(parsedHost);
-          console.log("Login Ekranı: Bağlantı bilgisi yüklendi:", parsedHost);
+          console.log('Login Ekrani: Baglanti bilgisi yüklendi:', parsedHost);
         } else {
-          navigation.navigate("Connect");
+          navigation.navigate('Connect');
         }
       } catch (err) {
-        setError("Bağlantı ayarları okunamadı.");
-        navigation.navigate("Connect");
+        setError('Baglanti ayarlari okunamadi.');
+        navigation.navigate('Connect');
       }
     };
     loadHost();
@@ -35,7 +33,7 @@ const Login = ({ navigation }) => {
 
   const handleLogin = async () => {
     if (!host || !host.ip || !host.port) {
-      setError("Bağlantı bilgileri eksik. Lütfen geri dönüp tekrar deneyin.");
+      setError('Baglanti bilgileri eksik. Lutfen geri donup tekrar deneyin.');
       return;
     }
 
@@ -45,38 +43,35 @@ const Login = ({ navigation }) => {
     try {
       const token = await authService.login(host.ip, host.port, username, password);
       if (token && typeof token === 'string') {
-        await AsyncStorage.setItem("authToken", token);
+        await AsyncStorage.setItem('authToken', token);
         navigation.replace('MainTabs');
       } else {
-        setError("Giriş yanıtı anlaşılamadı.");
+        setError('Giris yaniti anlasilamadi.');
       }
     } catch (err) {
-      setError(err.message || "Giriş sırasında bilinmeyen bir hata oluştu.");
+      setError(err.message || 'Giris sirasinda bilinmeyen bir hata olustu.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBackDisconnect = async () => {
-    try {
-      await statusService.sendDisconnect();
-    } catch {}
-    await AsyncStorage.removeItem("authToken");
-    navigation.navigate("Connect");
+  const handleBack = async () => {
+    await AsyncStorage.removeItem('authToken');
+    navigation.navigate('Connect');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Kullanıcı Girişi</Text>
+      <Text style={styles.title}>Kullanici Girisi</Text>
       <View style={styles.inputContainer}>
-        <PButton onPress={handleBackDisconnect} className="mb-4 bg-gray-400">
-          Geri / Bağlantıyı Kes
+        <PButton onPress={handleBack} className="mb-4 bg-gray-400">
+          Geri
         </PButton>
 
         <PInput
           value={username}
           onChangeText={setUsername}
-          placeholder='Kullanıcı Adı'
+          placeholder="Kullanici Adi"
           className="mb-4"
           autoCapitalize="none"
           editable={!loading}
@@ -84,27 +79,22 @@ const Login = ({ navigation }) => {
         <PInput
           value={password}
           onChangeText={setPassword}
-          placeholder='Şifre'
+          placeholder="Sifre"
           secureTextEntry
           className="mb-6"
           editable={!loading}
         />
 
-        {error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : null}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <PButton onPress={handleLogin} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            'Giriş Yap'
-          )}
+          {loading ? <ActivityIndicator color="white" /> : 'Giris Yap'}
         </PButton>
       </View>
     </View>
   );
-}
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -19,7 +19,6 @@ namespace DevicesControllerApp
         private FlowLayoutPanel _mobileToolbar;
         private Button _btnStartApi;
         private Button _btnStopApi;
-        private Button _btnDisconnect;
         private Label _lblConnection;
         private Label _lblTherapy;
         private Label _lblApi;
@@ -186,15 +185,6 @@ namespace DevicesControllerApp
             };
             _btnStopApi.Click += (s, e) => StopMobileStack();
 
-            _btnDisconnect = new Button
-            {
-                Text = "Baglantiyi Kes",
-                Width = 120,
-                Height = 35,
-                BackColor = Color.LightGray
-            };
-            _btnDisconnect.Click += (s, e) => StopMobileStack();
-
             _lblConnection = new Label
             {
                 Text = "Mobil baglanti: kapali",
@@ -221,7 +211,6 @@ namespace DevicesControllerApp
 
             _mobileToolbar.Controls.Add(_btnStartApi);
             _mobileToolbar.Controls.Add(_btnStopApi);
-            _mobileToolbar.Controls.Add(_btnDisconnect);
             _mobileToolbar.Controls.Add(_lblConnection);
             _mobileToolbar.Controls.Add(_lblTherapy);
             _mobileToolbar.Controls.Add(_lblApi);
