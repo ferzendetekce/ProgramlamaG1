@@ -6,7 +6,7 @@ import PButton from '../components/PButton';
 import statusService from '../services/statusService';
 
 const Connect = ({ navigation }) => {
-  const [ip, setIp] = useState("10.200.117.50");
+  const [ip, setIp] = useState("10.237.214.50");
   const [port, setPort] = useState("5086");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState('');

@@ -31,7 +31,7 @@ const getStoredHost = async () => {
   return raw ? JSON.parse(raw) : null;
 };
 
-const checkConnection = async (ip, port, timeoutMs = 1500) => {
+const checkConnection = async (ip, port, timeoutMs = 1800) => {
   const url = `http://${ip}:${port}/api/status/ping`;
   const response = await fetchWithTimeout(url, {}, timeoutMs);
   const data = await response.json();
@@ -52,7 +52,7 @@ const fetchTherapy = async () => {
     {
       headers: { Authorization: `Bearer ${token}` },
     },
-    2500
+    3000
   );
 
   const data = await response.json();
@@ -81,6 +81,7 @@ const autoDiscover = async () => {
   const primary = [
     stored,
     subnet ? { ip: `${subnet}.1`, port: DEFAULT_PORT } : null,
+    { ip: "10.237.214.50", port: DEFAULT_PORT },
     { ip: "10.200.117.50", port: DEFAULT_PORT },
     { ip: "10.0.2.2", port: DEFAULT_PORT },
     { ip: "127.0.0.1", port: DEFAULT_PORT },
@@ -98,6 +99,11 @@ const autoDiscover = async () => {
     for (let i = 0; i <= 255; i++) {
       candidates.push({ ip: `${subnet}.${i}`, port: DEFAULT_PORT });
     }
+  } else {
+    // subnet alınamadıysa bilinen ağ bloğunda dene (10.200.117.x)
+    for (let i = 1; i <= 254; i++) {
+      candidates.push({ ip: `10.200.117.${i}`, port: DEFAULT_PORT });
+    }
   }
 
   for (let i = 0; i < candidates.length; i += 25) {
@@ -105,7 +111,7 @@ const autoDiscover = async () => {
     const results = await Promise.all(
       batch.map(async (c) => {
         try {
-          await checkConnection(c.ip, c.port, 600);
+          await checkConnection(c.ip, c.port, 1000);
           return c;
         } catch {
           return null;
@@ -113,7 +119,10 @@ const autoDiscover = async () => {
       })
     );
     const found = results.find(Boolean);
-    if (found) return found;
+    if (found) {
+      await AsyncStorage.setItem("apiHost", JSON.stringify(found));
+      return found;
+    }
   }
 
   throw new Error("Hicbir aday IP'ye ulasilamadi. Manuel giriniz.");
