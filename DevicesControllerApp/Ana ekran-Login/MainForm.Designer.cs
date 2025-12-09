@@ -65,7 +65,7 @@
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(6);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -95,7 +95,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(24, 1027);
-            this.button1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.button1.Margin = new System.Windows.Forms.Padding(6);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(266, 77);
             this.button1.TabIndex = 11;
@@ -105,7 +105,7 @@
             // button11
             // 
             this.button11.Location = new System.Drawing.Point(24, 938);
-            this.button11.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.button11.Margin = new System.Windows.Forms.Padding(6);
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(266, 77);
             this.button11.TabIndex = 10;
@@ -116,18 +116,18 @@
             // button10
             // 
             this.button10.Location = new System.Drawing.Point(24, 850);
-            this.button10.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.button10.Margin = new System.Windows.Forms.Padding(6);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(266, 77);
             this.button10.TabIndex = 9;
-            this.button10.Text = "button10";
+            this.button10.Text = "Portlara Bağlanma";
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click_1);
             // 
             // button9
             // 
             this.button9.Location = new System.Drawing.Point(24, 762);
-            this.button9.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.button9.Margin = new System.Windows.Forms.Padding(6);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(266, 77);
             this.button9.TabIndex = 8;
@@ -138,7 +138,7 @@
             // button8
             // 
             this.button8.Location = new System.Drawing.Point(24, 673);
-            this.button8.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.button8.Margin = new System.Windows.Forms.Padding(6);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(266, 77);
             this.button8.TabIndex = 7;
@@ -148,7 +148,7 @@
             // btnSettings
             // 
             this.btnSettings.Location = new System.Drawing.Point(24, 585);
-            this.btnSettings.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnSettings.Margin = new System.Windows.Forms.Padding(6);
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(266, 77);
             this.btnSettings.TabIndex = 6;
@@ -159,7 +159,7 @@
             // btnService
             // 
             this.btnService.Location = new System.Drawing.Point(24, 496);
-            this.btnService.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnService.Margin = new System.Windows.Forms.Padding(6);
             this.btnService.Name = "btnService";
             this.btnService.Size = new System.Drawing.Size(266, 77);
             this.btnService.TabIndex = 5;
@@ -170,7 +170,7 @@
             // btnReports
             // 
             this.btnReports.Location = new System.Drawing.Point(24, 408);
-            this.btnReports.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnReports.Margin = new System.Windows.Forms.Padding(6);
             this.btnReports.Name = "btnReports";
             this.btnReports.Size = new System.Drawing.Size(266, 77);
             this.btnReports.TabIndex = 4;
@@ -181,7 +181,7 @@
             // btnMonitoring
             // 
             this.btnMonitoring.Location = new System.Drawing.Point(24, 319);
-            this.btnMonitoring.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnMonitoring.Margin = new System.Windows.Forms.Padding(6);
             this.btnMonitoring.Name = "btnMonitoring";
             this.btnMonitoring.Size = new System.Drawing.Size(266, 77);
             this.btnMonitoring.TabIndex = 3;
@@ -192,7 +192,7 @@
             // btnUsers
             // 
             this.btnUsers.Location = new System.Drawing.Point(24, 231);
-            this.btnUsers.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnUsers.Margin = new System.Windows.Forms.Padding(6);
             this.btnUsers.Name = "btnUsers";
             this.btnUsers.Size = new System.Drawing.Size(266, 77);
             this.btnUsers.TabIndex = 2;
@@ -203,7 +203,7 @@
             // btnPatient
             // 
             this.btnPatient.Location = new System.Drawing.Point(24, 142);
-            this.btnPatient.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnPatient.Margin = new System.Windows.Forms.Padding(6);
             this.btnPatient.Name = "btnPatient";
             this.btnPatient.Size = new System.Drawing.Size(266, 77);
             this.btnPatient.TabIndex = 1;
@@ -214,7 +214,7 @@
             // btnTherapy
             // 
             this.btnTherapy.Location = new System.Drawing.Point(24, 54);
-            this.btnTherapy.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnTherapy.Margin = new System.Windows.Forms.Padding(6);
             this.btnTherapy.Name = "btnTherapy";
             this.btnTherapy.Size = new System.Drawing.Size(266, 77);
             this.btnTherapy.TabIndex = 0;
@@ -226,7 +226,7 @@
             // 
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.splitContainer2.Margin = new System.Windows.Forms.Padding(6);
             this.splitContainer2.Name = "splitContainer2";
             this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -249,7 +249,7 @@
             this.ClientSize = new System.Drawing.Size(2140, 1154);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "MainForm";
             this.Text = "Devices Controller Main";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
