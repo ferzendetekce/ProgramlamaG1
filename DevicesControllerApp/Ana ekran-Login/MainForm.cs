@@ -14,6 +14,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -86,7 +87,7 @@ namespace DevicesControllerApp
                     if (latestData != null)
                     {
                         // Burası çok hızlı akar, testte aktığını görmek yeterli
-                         LogToScreen($"[VERİ ALINDI] Denge: %{latestData.WeightBalance:F2}"); 
+                        LogToScreen($"[VERİ ALINDI] Denge: %{latestData.WeightBalance:F2}");
                     }
                 });
             };
@@ -123,7 +124,7 @@ namespace DevicesControllerApp
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void btnTherapy_Click(object sender, EventArgs e)
@@ -330,38 +331,26 @@ namespace DevicesControllerApp
 
         private void button9_Click(object sender, EventArgs e)
         {
-            LogToScreen("=== CRC HESAPLAMA TESTİ ===");
+            bool currentMode = DeviceCommunication.Instance.SimulationMode;
 
-            // LoadCell paketi (CRC'siz kısım)
-            byte[] testData = new byte[]
-            {
-        0x15, 0x30, // Length + Command
-        0x00, 0x00, 0xCC, 0x41, // 25.5f (RightHeel)
-        0x00, 0x00, 0xF0, 0x41, // 30.0f (RightToe)
-        0x00, 0x00, 0xE0, 0x41, // 28.0f (LeftHeel)
-        0x00, 0x00, 0xD6, 0x41, // 26.75f (LeftToe)
-        0x7B, 0x00, 0x00, 0x00  // 123 (Index)
-            };
+            // Modu tersine çevir
+            DeviceCommunication.Instance.SimulationMode = !currentMode;
 
-            ushort crc = DeviceCommunication.Instance.CalculateCRC16(testData);
+            string modeText = DeviceCommunication.Instance.SimulationMode ? "AKTİF" : "KAPALI";
+            string emoji = DeviceCommunication.Instance.SimulationMode ? "🟢" : "🔴";
 
-            LogToScreen($"Hesaplanan CRC: 0x{crc:X4}");
-            LogToScreen($"CRC Low Byte: 0x{(byte)(crc & 0xFF):X2}");
-            LogToScreen($"CRC High Byte: 0x{(byte)(crc >> 8):X2}");
+            LogToScreen($"=== SİMÜLASYON MODU: {modeText} {emoji} ===");
 
-            // TAM PAKETİ OLUŞTUR
-            List<byte> fullPacket = new List<byte>();
-            fullPacket.Add(0x55); // Header 1
-            fullPacket.Add(0xAA); // Header 2
-            fullPacket.AddRange(testData);
-            fullPacket.Add((byte)(crc & 0xFF));        // CRC Low
-            fullPacket.Add((byte)((crc >> 8) & 0xFF)); // CRC High
-
-            string hexPacket = string.Join(" ", fullPacket.Select(b => b.ToString("X2")));
-            LogToScreen($"TAM PAKET (Hercules'e yapıştır):");
-            LogToScreen(hexPacket);
+            MessageBox.Show(
+                $"Simülasyon Modu: {modeText}\n\n" +
+                (DeviceCommunication.Instance.SimulationMode ?
+                    "✅ Cihaz yanıtları simüle edilecek (test için)" :
+                    "⚠️ Gerçek cihaz yanıtları beklenecek"),
+                "Simülasyon Modu",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
-       
+
 
         private void button11_Click_1(object sender, EventArgs e)
         {
@@ -406,6 +395,134 @@ namespace DevicesControllerApp
                 LogToScreen("Port kapatma işlemi iptal edildi.");
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (!DeviceCommunication.Instance.IsConnected)
+            {
+                LogToScreen("⚠️ Port açık değil! Önce Button10 ile port açın.");
+                return;
+            }
+
+            LogToScreen("=== HIZ OKUMA VE DEĞİŞTİRME TESTİ ===");
+
+            // 1. Mevcut hızı oku
+            LogToScreen("1️⃣ Mevcut hız okunuyor...");
+            double currentSpeed = DeviceCommunication.Instance.GetCurrentSpeed();
+
+            if (currentSpeed >= 0)
+            {
+                LogToScreen($"   ✓ Mevcut hız: {currentSpeed}");
+            }
+            else
+            {
+                LogToScreen($"   ✗ Hız okunamadı!");
+                return;
+            }
+
+            // 2. Yeni hız ayarla
+            double newSpeed = 75.5;
+            LogToScreen($"2️⃣ Yeni hız ayarlanıyor: {newSpeed}");
+
+            bool setResult = DeviceCommunication.Instance.SetSpeedWithConfirmation(newSpeed);
+
+            if (setResult)
+            {
+                LogToScreen($"   ✓ Hız başarıyla {newSpeed} olarak ayarlandı!");
+
+                // 3. Tekrar oku (doğrulama)
+                Thread.Sleep(100);
+                LogToScreen("3️⃣ Yeni hız doğrulanıyor...");
+
+                double verifySpeed = DeviceCommunication.Instance.GetCurrentSpeed();
+
+                if (verifySpeed >= 0)
+                {
+                    LogToScreen($"   ✓ Doğrulanan hız: {verifySpeed}");
+
+                    if (Math.Abs(verifySpeed - newSpeed) < 0.1)
+                    {
+                        LogToScreen("   🎉 HIZ DEĞİŞİKLİĞİ BAŞARILI!");
+                    }
+                    else
+                    {
+                        LogToScreen($"   ⚠️ Hız uyuşmazlığı! Ayarlanan: {newSpeed}, Okunan: {verifySpeed}");
+                    }
+                }
+            }
+            else
+            {
+                LogToScreen($"   ✗ Hız ayarlanamadı!");
+            }
+
+            LogToScreen("=== TEST TAMAMLANDI ===");
+        }
+        
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (!DeviceCommunication.Instance.IsConnected)
+            {
+                LogToScreen("⚠️ Port açık değil! Önce Button10 ile port açın.");
+                return;
+            }
+
+            LogToScreen("=== MOTOR HAREKET TESTİ ===");
+
+            int motorIndex = 1;
+
+            // 1. Başlangıç pozisyonunu oku
+            LogToScreen($"1️⃣ Motor {motorIndex} başlangıç pozisyonu okunuyor...");
+            int startPosition = DeviceCommunication.Instance.GetMotorPosition(motorIndex);
+
+            if (startPosition >= 0)
+            {
+                LogToScreen($"   ✓ Başlangıç pozisyonu: {startPosition}");
+            }
+            else
+            {
+                LogToScreen($"   ✗ Pozisyon okunamadı!");
+                return;
+            }
+
+            // 2. Motoru hareket ettir
+            int steps = 100;
+            LogToScreen($"2️⃣ Motor {motorIndex} → {steps} adım ilerletiliyor...");
+
+            bool moveResult = DeviceCommunication.Instance.MoveMotor(motorIndex, steps);
+
+            if (moveResult)
+            {
+                LogToScreen($"   ✓ Motor başarıyla hareket etti!");
+
+                // 3. Yeni pozisyonu oku
+                Thread.Sleep(200);
+                LogToScreen($"3️⃣ Yeni pozisyon okunuyor...");
+
+                int endPosition = DeviceCommunication.Instance.GetMotorPosition(motorIndex);
+
+                if (endPosition >= 0)
+                {
+                    LogToScreen($"   ✓ Yeni pozisyon: {endPosition}");
+                    LogToScreen($"   📊 Hareket: {startPosition} → {endPosition} ({endPosition - startPosition} adım)");
+
+                    if (endPosition - startPosition == steps)
+                    {
+                        LogToScreen("   🎉 MOTOR HAREKETİ BAŞARILI!");
+                    }
+                    else
+                    {
+                        LogToScreen($"   ⚠️ Pozisyon uyuşmazlığı! Beklenen: {steps}, Gerçek: {endPosition - startPosition}");
+                    }
+                }
+            }
+            else
+            {
+                LogToScreen($"   ✗ Motor hareket ettirilemedi!");
+            }
+
+            LogToScreen("=== TEST TAMAMLANDI ===");
+        }
     }
- }
+}
 
