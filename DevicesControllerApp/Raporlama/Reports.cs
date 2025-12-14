@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
 using Npgsql;
+using System.Globalization;
+using System.Threading;
 
 namespace DevicesControllerApp.Raporlama
 {
@@ -23,11 +25,22 @@ namespace DevicesControllerApp.Raporlama
         public Reports()
         {
             InitializeComponent();
+            FillLanguageCombo();
         }
 
         private void label2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void FillLanguageCombo()
+        {
+            cmbLanguage.Items.Clear();
+            cmbLanguage.Items.Add("Türkçe");
+            cmbLanguage.Items.Add("English");
+            cmbLanguage.Items.Add("العربية");
+
+            cmbLanguage.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         private void btnRaporOlustur_Click(object sender, EventArgs e)
@@ -110,19 +123,32 @@ namespace DevicesControllerApp.Raporlama
 
         private void Reports_Load_1(object sender, EventArgs e)
         {
+            if (System.ComponentModel.LicenseManager.UsageMode
+       == System.ComponentModel.LicenseUsageMode.Designtime)
+                return;
+
             try
             {
-                NpgsqlConnection conn = new NpgsqlConnection(connectionString);
-                conn.Open();
-                // MessageBox.Show(" Veritabanına bağlandı");
-                conn.Close();
+                using (var conn = new Npgsql.NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(" Hata:\n" + ex.Message);
+                MessageBox.Show("Hata:\n" + ex.Message);
             }
         }
 
+        public void SetLanguage(string culture)
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo(culture);
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
+
+            this.Controls.Clear();
+            InitializeComponent();
+            FillLanguageCombo();
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             {
@@ -180,6 +206,16 @@ namespace DevicesControllerApp.Raporlama
                     }
                 }
             }
+        }
+
+        private void cmbLanguage_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbLanguage.SelectedIndex == 0)
+                SetLanguage("tr-TR");
+            else if (cmbLanguage.SelectedIndex == 1)
+                SetLanguage("en-US");
+            else if (cmbLanguage.SelectedIndex == 2)
+                SetLanguage("ar-SA");
         }
     }
 }
