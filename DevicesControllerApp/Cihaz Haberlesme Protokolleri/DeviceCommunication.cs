@@ -10,6 +10,12 @@ namespace RehabilitationSystem.Communication
     {
         private static DeviceCommunication _instance;
         private static readonly object _lock = new object();
+        private Dictionary<byte, ManualResetEvent> _responseWaiters = new Dictionary<byte, ManualResetEvent>();
+        private Dictionary<byte, byte[]> _responseData = new Dictionary<byte, byte[]>();
+        private readonly object _responseLock = new object();
+        private float _simulatedSpeed = 50.0f;
+        private Dictionary<int, int> _simulatedMotorPositions = new Dictionary<int, int>();
+
 
         private SerialPort _serialPort;
         private Thread _readThread;
@@ -35,6 +41,8 @@ namespace RehabilitationSystem.Communication
         public string CurrentPort { get; private set; }
         public int BaudRate { get; private set; }
         public int CommandTimeout { get; set; } = 1000; // ms
+
+        public bool SimulationMode { get; set; } = false; // Test için
 
         // Singleton Instance
         public static DeviceCommunication Instance
@@ -212,21 +220,31 @@ namespace RehabilitationSystem.Communication
 
         private void DispatchReceivedPacket(byte commandCode, byte[] payload)
         {
-            // Komut koduna göre işlem yap (Enum: CommandCode)
+            // Önce yanıt bekleyen var mı kontrol et
+            lock (_responseLock)
+            {
+                if (_responseWaiters.ContainsKey(commandCode))
+                {
+                    _responseData[commandCode] = payload;
+                    _responseWaiters[commandCode].Set(); // Bekleyeni uyandır
+                    return; // Event fırlatma, sadece bekleyene ver
+                }
+            }
+
+            // Yanıt bekleyen yoksa normal işlem
             CommandCode code = (CommandCode)commandCode;
 
             switch (code)
             {
-                case CommandCode.ReadLoadCell: // Örnek: LoadCell verisi geldi
+                case CommandCode.ReadLoadCell:
                     ParseLoadCellData(payload);
                     break;
 
-                case CommandCode.ReadStatus: // Cihaz durumu geldi
-                                             // ParseDeviceStatus(payload); // Bu metodu sonra yazarız
+                case CommandCode.ReadStatus:
+                    // ParseDeviceStatus(payload);
                     break;
 
                 default:
-                    // Genel komut yanıtı olarak event fırlat
                     OnCommandResponseReceived(commandCode, payload);
                     break;
             }
@@ -254,10 +272,138 @@ namespace RehabilitationSystem.Communication
             }
         }
 
-        public byte[] SendCommandAndWaitResponse(byte commandCode, byte[] data = null,
-            int timeoutMs = 0)
+        public byte[] SendCommandAndWaitResponse(byte commandCode, byte[] data = null, int timeoutMs = 0)
         {
-            return null;
+            if (timeoutMs == 0)
+                timeoutMs = CommandTimeout;
+
+            try
+            {
+                //  SİMÜLASYON MODU: Gerçek cihaz olmadan test
+                if (SimulationMode)
+                {
+                    LogCommunication($"[SİMÜLASYON] Komut 0x{commandCode:X2} gönderildi, sahte yanıt üretiliyor...");
+                    Thread.Sleep(100); // Gerçekçi gecikme
+                    return GenerateSimulatedResponse(commandCode, data);
+                }
+
+                // Normal mod (gerçek cihazla)
+                ManualResetEvent waitHandle = new ManualResetEvent(false);
+
+                lock (_responseLock)
+                {
+                    _responseWaiters[commandCode] = waitHandle;
+                    if (_responseData.ContainsKey(commandCode))
+                        _responseData.Remove(commandCode);
+                }
+
+                if (!SendCommand(commandCode, data))
+                {
+                    lock (_responseLock)
+                    {
+                        _responseWaiters.Remove(commandCode);
+                    }
+                    return null;
+                }
+
+                bool received = waitHandle.WaitOne(timeoutMs);
+
+                lock (_responseLock)
+                {
+                    _responseWaiters.Remove(commandCode);
+
+                    if (received && _responseData.ContainsKey(commandCode))
+                    {
+                        byte[] response = _responseData[commandCode];
+                        _responseData.Remove(commandCode);
+                        return response;
+                    }
+                }
+
+                LogCommunication($"TIMEOUT! Komut 0x{commandCode:X2} için {timeoutMs}ms içinde yanıt gelmedi.", true);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LogCommunication($"SendCommandAndWaitResponse hatası: {ex.Message}", true);
+                return null;
+            }
+        }
+
+        private byte[] GenerateSimulatedResponse(byte commandCode, byte[] sentData)
+        {
+            CommandCode cmd = (CommandCode)commandCode;
+
+            switch (cmd)
+            {
+                case CommandCode.Connect:
+                    return new byte[] { 0x01 };
+
+                case CommandCode.Disconnect:
+                    return new byte[] { 0x01 };
+
+                case CommandCode.SetSpeed:
+                    // Gönderilen hızı kaydet
+                    if (sentData != null && sentData.Length >= 4)
+                    {
+                        _simulatedSpeed = BitConverter.ToSingle(sentData, 0);
+                    }
+                    return new byte[] { 0x01 };
+
+                case CommandCode.GetSpeed:
+                    // Kaydedilmiş hızı döndür
+                    return BitConverter.GetBytes(_simulatedSpeed);
+
+                case CommandCode.SetStepMotor:
+                    // Motor hareketini simüle et
+                    if (sentData != null && sentData.Length >= 5)
+                    {
+                        int motorIndex = sentData[0];
+                        int steps = BitConverter.ToInt32(sentData, 1);
+
+                        if (!_simulatedMotorPositions.ContainsKey(motorIndex))
+                            _simulatedMotorPositions[motorIndex] = 0;
+
+                        _simulatedMotorPositions[motorIndex] += steps;
+
+                        LogCommunication($"[SİMÜLASYON] Motor {motorIndex}: {_simulatedMotorPositions[motorIndex] - steps} → {_simulatedMotorPositions[motorIndex]}");
+                    }
+                    return new byte[] { 0x01 };
+
+                case CommandCode.GetMotorPosition:
+                    // Motor pozisyonunu döndür
+                    int requestedMotor = 0;
+
+                    if (sentData != null && sentData.Length >= 1)
+                    {
+                        requestedMotor = sentData[0];
+                    }
+
+                    if (!_simulatedMotorPositions.ContainsKey(requestedMotor))
+                        _simulatedMotorPositions[requestedMotor] = 0;
+
+                    return BitConverter.GetBytes(_simulatedMotorPositions[requestedMotor]);
+
+                case CommandCode.StartTherapy:
+                    return new byte[] { 0x01 };
+
+                case CommandCode.StopTherapy:
+                    return new byte[] { 0x01 };
+
+                case CommandCode.PauseTherapy:
+                    return new byte[] { 0x01 };
+
+                case CommandCode.ResumeTherapy:
+                    return new byte[] { 0x01 };
+
+                case CommandCode.EmergencyStop:
+                    LogCommunication("[SİMÜLASYON] ACİL DURDURMA aktif!");
+                    return new byte[] { 0x01 };
+
+                default:
+                    LogCommunication($"[SİMÜLASYON] Bilinmeyen komut: 0x{commandCode:X2}");
+                    return new byte[] { 0x00 };
+            }
         }
 
         private byte[] BuildCommandPacket(byte commandCode, byte[] data)
@@ -537,6 +683,80 @@ namespace RehabilitationSystem.Communication
             return false;
         }
 
+        public bool Connect()
+        {
+            LogCommunication("Cihaza bağlanılıyor...");
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.Connect, null, 2000);
+
+            if (response != null)
+            {
+                LogCommunication("✓ Cihaz bağlantısı onaylandı!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Cihaz bağlantısı başarısız (timeout)!", true);
+                return false;
+            }
+        }
+
+        public bool Disconnect()
+        {
+            LogCommunication("Cihaz bağlantısı kesiliyor...");
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.Disconnect, null, 2000);
+
+            if (response != null)
+            {
+                LogCommunication("✓ Cihaz bağlantısı kesildi!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Disconnect timeout!", true);
+                return false;
+            }
+        }
+
+        public bool SetSpeedWithConfirmation(double speed)
+        {
+            LogCommunication($"Hız ayarlanıyor: {speed}");
+
+            byte[] speedData = BitConverter.GetBytes((float)speed);
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.SetSpeed, speedData, 1500);
+
+            if (response != null)
+            {
+                LogCommunication($"✓ Hız başarıyla {speed} olarak ayarlandı!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Hız ayarlama timeout!", true);
+                return false;
+            }
+        }
+
+        public double GetCurrentSpeed()
+        {
+            LogCommunication("Mevcut hız sorgulanıyor...");
+
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.GetSpeed, null, 1000);
+
+            if (response != null && response.Length >= 4)
+            {
+                float speed = BitConverter.ToSingle(response, 0);
+                LogCommunication($"✓ Mevcut hız: {speed}");
+                return speed;
+            }
+            else
+            {
+                LogCommunication("✗ Hız okuma başarısız (timeout veya geçersiz veri)!", true);
+                return -1;
+            }
+        }
+
+
+
         private void ParseLoadCellData(byte[] payload)
         {
             // Beklenen veri boyutu kontrolü (4 float + 1 int = 20 byte)
@@ -667,7 +887,48 @@ namespace RehabilitationSystem.Communication
             });
         }
 
-        // Mevcut "return false" dönen metotları bunlarla değiştirin:
+        public bool MoveMotor(int motorIndex, int steps)
+        {
+            LogCommunication($"Motor {motorIndex} -> {steps} adım ilerletiliyor...");
+
+            List<byte> payload = new List<byte>();
+            payload.Add((byte)motorIndex);
+            payload.AddRange(BitConverter.GetBytes(steps));
+
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.SetStepMotor, payload.ToArray(), 2000);
+
+            if (response != null)
+            {
+                LogCommunication($"✓ Motor {motorIndex} başarıyla {steps} adım ilerledi!");
+                return true;
+            }
+            else
+            {
+                LogCommunication($"✗ Motor hareket timeout!", true);
+                return false;
+            }
+        }
+
+        public int GetMotorPosition(int motorIndex)
+        {
+            LogCommunication($"Motor {motorIndex} pozisyonu sorgulanıyor...");
+
+            byte[] motorIndexData = new byte[] { (byte)motorIndex };
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.GetMotorPosition, motorIndexData, 1000);
+
+            if (response != null && response.Length >= 4)
+            {
+                int position = BitConverter.ToInt32(response, 0);
+                LogCommunication($"✓ Motor {motorIndex} pozisyonu: {position}");
+                return position;
+            }
+            else
+            {
+                LogCommunication($"✗ Motor pozisyon okuma başarısız!", true);
+                return -1;
+            }
+        }
+
 
         public bool StartTherapy()
         {
@@ -1019,7 +1280,9 @@ namespace RehabilitationSystem.Communication
         SetServoMotor = 0x40,
         SetStepMotor = 0x41,
         LoadPattern = 0x50,
-        HomeDevice = 0x51
+        HomeDevice = 0x51,
+        GetSpeed = 0x25, // YENİ
+        GetMotorPosition = 0x42, // YENİ
     }
 
     #endregion
