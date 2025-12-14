@@ -99,8 +99,9 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(266, 77);
             this.button1.TabIndex = 11;
-            this.button1.Text = "button1";
+            this.button1.Text = "Hız Ayarlama";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button11
             // 
@@ -109,8 +110,9 @@
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(266, 77);
             this.button11.TabIndex = 10;
-            this.button11.Text = "button11";
+            this.button11.Text = "Port Bağlantısını Kes";
             this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click_1);
             // 
             // button10
             // 
@@ -119,7 +121,7 @@
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(266, 77);
             this.button10.TabIndex = 9;
-            this.button10.Text = "button10";
+            this.button10.Text = "Portlara Bağlanma";
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click_1);
             // 
@@ -130,8 +132,9 @@
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(266, 77);
             this.button9.TabIndex = 8;
-            this.button9.Text = "button9";
+            this.button9.Text = "Simulasyon Modu";
             this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // button8
             // 
@@ -140,8 +143,9 @@
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(266, 77);
             this.button8.TabIndex = 7;
-            this.button8.Text = "button8";
+            this.button8.Text = "Motor Pozisyon Ayarlama";
             this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // btnSettings
             // 
@@ -236,7 +240,7 @@
             // 
             this.splitContainer2.Panel2.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.splitContainer2.Size = new System.Drawing.Size(1804, 1132);
-            this.splitContainer2.SplitterDistance = 135;
+            this.splitContainer2.SplitterDistance = 131;
             this.splitContainer2.SplitterWidth = 8;
             this.splitContainer2.TabIndex = 0;
             // 
