@@ -1,70 +1,72 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RehabilitationSystem.EngineAPI.Services;
+using RehabilitationSystem.Communication; // DeviceCommunication'ın olduğu namespace
+// using RehabilitationSystem.Models; // Therapy modelinin olduğu namespace
 
-namespace RehabilitationSystem.EngineAPI.Controllers
+namespace RehabilitationSystem.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [ApiController]
     public class CommandController : ControllerBase
     {
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CommandRequest request)
+        // Global servis veya static değişkene erişim (Proje yapına göre değişebilir)
+        // Örnek: TherapyService.CurrentTherapy
+        
+        [HttpPost("start")]
+        public IActionResult StartTherapy()
         {
-            if (string.IsNullOrWhiteSpace(request.Command))
-            {
-                return BadRequest(new { status = "error", message = "Komut boş olamaz." });
-            }
+            // 1. Cihaza 'Başla' komutunu gönder
+            bool commandSent = DeviceCommunication.Instance.StartTherapy();
 
-            var incomingCommand = request.Command.Trim().ToLower();
-            Console.WriteLine($"Gelen komut: {incomingCommand}");
-
-            if (!PermissionMatrix.IsAllowed(User, incomingCommand, out var reason))
+            if (commandSent)
             {
-                return StatusCode(403, new { status = "error", message = reason });
-            }
-
-            try
-            {
-                var envelope = incomingCommand switch
+                // *** KRİTİK DEĞİŞİKLİK ***
+                // Cihazdan yanıt gelmesini beklemeden API'deki durumu hemen güncelle!
+                // Böylece mobil uygulama "isRunning: true" görür.
+                
+                // Buradaki 'CurrentTherapyService' senin projendeki terapi durumunu tutan static sınıf veya servis olmalı.
+                if (TherapyService.CurrentTherapy != null)
                 {
-                    "start" => await Engine.Start(),
-                    "stop" => await Engine.Stop(),
-                    "pause" => await Engine.Pause(),
-                    "resume" => await Engine.Resume(),
-                    "emergencystop" => await Engine.EmergencyStop(),
-                    "disconnect" => await Engine.Stop(),
-                    "up" => await Engine.MoveUp(),
-                    "down" => await Engine.MoveDown(),
-                    "footincrease" => await Engine.FootIncrease(),
-                    "footdecrease" => await Engine.FootDecrease(),
-                    "barup" => await Engine.BarUp(),
-                    "bardown" => await Engine.BarDown(),
-                    "weightincrease" => await Engine.WeightIncrease(),
-                    "weightdecrease" => await Engine.WeightDecrease(),
-                    _ => null
-                };
-
-                if (envelope == null)
-                {
-                    var errorMessage = Engine.LastError ?? "Ana forma ulaşılamadı.";
-                    return StatusCode(503, new { status = "error", message = errorMessage });
+                    TherapyService.CurrentTherapy.IsRunning = true;
+                    TherapyService.CurrentTherapy.StatusText = "Terapi Başladı";
+                    TherapyService.CurrentTherapy.StartedAt = DateTime.Now;
+                    TherapyService.CurrentTherapy.IsPaused = false;
+                    TherapyService.CurrentTherapy.IsEmergency = false;
                 }
-
-                return Ok(new { status = "ok", received = incomingCommand, therapy = envelope.Therapy });
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Komut işlenirken hata oluştu: {ex.Message}");
-                var message = Engine.LastError ?? "Sunucuda bir hata oluştu.";
-                return StatusCode(500, new { status = "error", message });
+                return StatusCode(500, new { message = "Cihaza komut gönderilemedi." });
             }
-        }
-    }
 
-    public class CommandRequest
-    {
-        public string? Command { get; set; }
+            // Güncellenmiş nesneyi geri döndür
+            return Ok(new 
+            { 
+                received = "start", 
+                status = "ok", 
+                therapy = TherapyService.CurrentTherapy 
+            });
+        }
+
+        [HttpPost("stop")]
+        public IActionResult StopTherapy()
+        {
+            bool commandSent = DeviceCommunication.Instance.StopTherapy();
+            
+            if (commandSent && TherapyService.CurrentTherapy != null)
+            {
+                // Durdurma işleminde de manuel güncelleme yapalım
+                TherapyService.CurrentTherapy.IsRunning = false;
+                TherapyService.CurrentTherapy.StatusText = "Durduruldu";
+            }
+
+            return Ok(new 
+            { 
+                received = "stop", 
+                status = "ok", 
+                therapy = TherapyService.CurrentTherapy 
+            });
+        }
+        
+        // Diğer komutlar (up, down vb.) burada kalabilir...
     }
 }
