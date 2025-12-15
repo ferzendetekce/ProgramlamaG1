@@ -1,0 +1,9 @@
+.vs/
+bin/
+obj/
+*.user
+*.suo
+CopilotIndices/
+FileContentIndex/
+copilot-chat/
+packages/
