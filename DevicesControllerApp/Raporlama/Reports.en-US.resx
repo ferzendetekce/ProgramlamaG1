@@ -154,6 +154,12 @@
   <data name="rbHastalariListele.Text" xml:space="preserve">
     <value>List Patients</value>
   </data>
+  <data name="dtBitis.CustomFormat" xml:space="preserve">
+    <value>MM-dd-yyyy</value>
+  </data>
+  <data name="dtBaslangic.CustomFormat" xml:space="preserve">
+    <value>MM-dd-yyyy</value>
+  </data>
   <data name="label5.Size" type="System.Drawing.Size, System.Drawing">
     <value>34, 16</value>
   </data>

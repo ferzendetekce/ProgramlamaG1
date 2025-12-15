@@ -148,7 +148,10 @@ namespace DevicesControllerApp.Raporlama
             this.Controls.Clear();
             InitializeComponent();
             FillLanguageCombo();
+            
         }
+
+        
         private void button1_Click(object sender, EventArgs e)
         {
             {
