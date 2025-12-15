@@ -124,4 +124,10 @@
   <data name="Custom-Icon-Design-Flatastic-5-Reports.64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Custom-Icon-Design-Flatastic-5-Reports.64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="dil" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\dil.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Iconoir-Team-Iconoir-Language.48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Iconoir-Team-Iconoir-Language.48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

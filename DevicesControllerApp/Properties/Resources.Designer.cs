@@ -73,6 +73,26 @@ namespace DevicesControllerApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap dil {
+            get {
+                object obj = ResourceManager.GetObject("dil", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Iconoir_Team_Iconoir_Language_48 {
+            get {
+                object obj = ResourceManager.GetObject("Iconoir-Team-Iconoir-Language.48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Reports_icon {
             get {
                 object obj = ResourceManager.GetObject("Reports-icon", resourceCulture);
