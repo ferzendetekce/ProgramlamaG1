@@ -26,9 +26,13 @@ namespace DevicesControllerApp
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            Settings s= new Settings();
+            Settings s = new Settings();
+            // Make the UserControl fill the entire panel
+            s.Dock = DockStyle.Fill;
+            s.Margin = Padding.Empty;
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(s);
+            s.BringToFront();
         }
 
         private void btnPatient_Click(object sender, EventArgs e)

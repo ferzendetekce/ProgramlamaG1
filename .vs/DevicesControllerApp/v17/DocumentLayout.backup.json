@@ -1,13 +1,25 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\",
+  "WorkspaceRootPath": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\users\\feyz\\source\\repos\\programlamag11\\devicescontrollerapp\\kullanici\\userregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\kullanici\\userregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ayarlar\\settings.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
@@ -18,8 +30,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 11,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
@@ -45,27 +61,71 @@
               "Name": "ST:131:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UserRegistration.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Kullanici\\UserRegistration.cs",
-              "RelativeDocumentMoniker": "DevicesControllerApp\\Kullanici\\UserRegistration.cs",
-              "ToolTip": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Kullanici\\UserRegistration.cs [Design]",
-              "RelativeToolTip": "DevicesControllerApp\\Kullanici\\UserRegistration.cs [Design]",
+              "DocumentIndex": 3,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "RelativeToolTip": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAApwCIAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-21T11:41:47.992Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-12-15T12:02:46.746Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Settings.Designer.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.Designer.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.Designer.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.Designer.cs*",
+              "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.Designer.cs*",
+              "ViewState": "AgIAAOwAAAAAAAAAAAAgwP0AAABuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T11:52:43.151Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Settings.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs*",
+              "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.cs*",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T10:19:19.013Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Settings.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.cs [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T10:18:54.734Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "MainForm.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
-              "ToolTip": "C:\\Users\\Feyz\\source\\repos\\ProgramlamaG11\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]",
               "RelativeToolTip": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-21T11:40:40.432Z"
+              "WhenOpened": "2025-12-15T07:57:24.075Z",
+              "EditorCaption": " [Design]"
             }
           ]
         }
