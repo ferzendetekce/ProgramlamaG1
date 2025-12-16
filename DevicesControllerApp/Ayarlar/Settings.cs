@@ -38,10 +38,6 @@ namespace DevicesControllerApp.Ayarlar
             if (comboBox1.Items.Count > 0)
                 comboBox1.SelectedIndex = 0;
 
-            // Varsayılan tema: Light (Index 0)
-            // Eğer daha önce seçilmediyse varsayılan olarak 0 (Light) seçelim.
-            if (comboBox5.Items.Count > 0)
-                comboBox5.SelectedIndex = 0;
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -75,39 +71,37 @@ namespace DevicesControllerApp.Ayarlar
 
 
 
-
-
         public void ApplyTheme(bool isDark)
         {
-            if (isDark)
+            // 1. Tüm renkleri (Tablolar dahil) güncellemek için zaten var olan metodunuzu çağırıyoruz.
+            // "Dark" ise koyu, değilse varsayılan (else) bloğu çalışır.
+            string temaAdi = isDark ? "Dark" : "Light";
+            TemaGuncelle(temaAdi);
+
+            // 2. ComboBox seçimini de güncelleyelim ki ekranda "Dark" seçili görünsün.
+            // ÖNEMLİ: Seçimi değiştirirken Event'i geçici olarak kapatıyoruz, yoksa tekrar başa döner.
+            if (comboBox5.Items.Count > 0)
             {
-                this.BackColor = Color.FromArgb(45, 45, 48);
+                comboBox5.SelectedIndexChanged -= ComboBox5_SelectedIndexChanged;
 
-                foreach (Control c in this.Controls)
+                if (isDark)
                 {
-                    if (c is Label || c is CheckBox)
-                        c.ForeColor = Color.White;
-
-                    if (c is Button btn)
-                    {
-                        btn.BackColor = Color.FromArgb(60, 60, 60);
-                        btn.ForeColor = Color.White;
-                    }
+                    // "Dark" yazısını bulup seçmeye çalış, bulamazsa 2. sıradakini (index 1) seç
+                    int index = comboBox5.Items.IndexOf("Dark");
+                    if (index != -1)
+                        comboBox5.SelectedIndex = index;
+                    else if (comboBox5.Items.Count > 1)
+                        comboBox5.SelectedIndex = 1;
                 }
-            }
-            else
-            {
-                this.BackColor = Color.White;
-
-                foreach (Control c in this.Controls)
+                else
                 {
-                    c.ForeColor = Color.Black;
-                    if (c is Button btn)
-                        btn.BackColor = SystemColors.Control;
+                    // Light mod için genelde ilk sıradaki (Index 0) seçilir
+                    comboBox5.SelectedIndex = 0;
                 }
+
+                comboBox5.SelectedIndexChanged += ComboBox5_SelectedIndexChanged;
             }
         }
-
 
 
 
