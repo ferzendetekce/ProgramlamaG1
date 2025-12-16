@@ -10,23 +10,27 @@ using System.Windows.Forms;
 
 namespace DevicesControllerApp.Ana_ekran_Login
 {
-    public partial class login : Form
+    public partial class register : Form
     {
-        public login()
+        public register()
         {
             InitializeComponent();
         }
 
 
 
-        private void login_Load(object sender, EventArgs e)
+
+
+
+
+
+
+
+        private void button1_Click(object sender, EventArgs e)
         {
-
+              MainForm mainForm = new MainForm();
+                mainForm.Show();
+                this.Hide();
         }
-
-
-
-
-
     }
 }

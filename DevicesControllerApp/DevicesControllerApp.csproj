@@ -95,17 +95,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ana ekran-Login\login.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Ana ekran-Login\login.Designer.cs">
-      <DependentUpon>login.cs</DependentUpon>
-    </Compile>
     <Compile Include="Ana ekran-Login\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Ana ekran-Login\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ana ekran-Login\register.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ana ekran-Login\register.Designer.cs">
+      <DependentUpon>register.cs</DependentUpon>
     </Compile>
     <Compile Include="Ayarlar\Settings.cs">
       <SubType>UserControl</SubType>
@@ -155,11 +155,11 @@
     <Compile Include="Veri izleme\DataMonitoring.Designer.cs">
       <DependentUpon>DataMonitoring.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Ana ekran-Login\login.resx">
-      <DependentUpon>login.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Ana ekran-Login\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ana ekran-Login\register.resx">
+      <DependentUpon>register.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Ayarlar\Settings.resx">
       <DependentUpon>Settings.cs</DependentUpon>

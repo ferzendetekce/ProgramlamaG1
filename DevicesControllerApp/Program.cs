@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DevicesControllerApp.Ana_ekran_Login;
 
 namespace DevicesControllerApp
 {
@@ -16,7 +17,8 @@ namespace DevicesControllerApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            Application.Run(new register());
+
         }
     }
 }

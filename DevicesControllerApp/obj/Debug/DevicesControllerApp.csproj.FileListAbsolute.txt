@@ -83,3 +83,4 @@ C:\VisualStudyoCSharp\Form\ProgramlamaG1\DevicesControllerApp\bin\Debug\System.T
 C:\VisualStudyoCSharp\Form\ProgramlamaG1\DevicesControllerApp\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\VisualStudyoCSharp\Form\ProgramlamaG1\DevicesControllerApp\bin\Debug\System.ValueTuple.xml
 C:\VisualStudyoCSharp\Form\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesC.6560B99F.Up2Date
+C:\VisualStudyoCSharp\Form\ProgramlamaG1\DevicesControllerApp\obj\Debug\DevicesControllerApp.Ana_ekran_Login.register.resources
