@@ -3,9 +3,8 @@
     "",
     "\\DevicesControllerApp",
     "\\DevicesControllerApp\\Ana ekran-Login",
-    "\\DevicesControllerApp\\Ayarlar",
-    "\\DevicesControllerApp\\Database"
+    "\\DevicesControllerApp\\Ayarlar"
   ],
-  "SelectedNode": "\\DevicesControllerApp\\Ana ekran-Login\\MainForm.resx",
+  "SelectedNode": "\\DevicesControllerApp\\Ana ekran-Login\\register.cs",
   "PreviewInSolutionExplorer": false
 }

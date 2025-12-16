@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.Designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DevicesControllerApp\\Ayarlar\\Settings.Designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DevicesControllerApp\\Ayarlar\\Settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.Designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DevicesControllerApp\\Ayarlar\\Settings.Designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -54,7 +54,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Settings.Designer.cs",
               "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.Designer.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.Designer.cs",
@@ -62,20 +62,20 @@
               "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.Designer.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-16T09:33:09.737Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-16T09:33:09.737Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Settings.cs",
               "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.cs",
               "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
               "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.cs",
-              "ViewState": "AgIAAIQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-16T09:32:59.389Z"
+              "WhenOpened": "2025-12-16T09:32:59.389Z",
+              "EditorCaption": ""
             }
           ]
         }
