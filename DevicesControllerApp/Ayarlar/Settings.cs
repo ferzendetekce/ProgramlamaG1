@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevicesControllerApp.Database;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,7 +18,7 @@ namespace DevicesControllerApp.Ayarlar
         public event Action<string> OnLanguageChanged;
         public event Action<bool> OnThemeChanged;
 
-
+        private DatabaseManager dbManager = new DatabaseManager();
 
         public Settings()
         {
@@ -44,6 +45,7 @@ namespace DevicesControllerApp.Ayarlar
         {
             string lang = comboBox1.SelectedIndex == 1 ? "en" : "tr";
             DiliGuncelle(lang);
+            dbManager.UpdateLanguage(lang);
 
             // 2. Olayı Tetikle (MainForm'a haber ver)
             OnLanguageChanged?.Invoke(lang);
@@ -59,6 +61,7 @@ namespace DevicesControllerApp.Ayarlar
 
                 // Önce kendi (Settings) renklerini güncelle
                 TemaGuncelle(secilenTema);
+                dbManager.UpdateTheme(secilenTema);
 
                 // --- DÜZELTME BURADA ---
                 // Seçilen tema "Dark" ise true, değilse false olsun.

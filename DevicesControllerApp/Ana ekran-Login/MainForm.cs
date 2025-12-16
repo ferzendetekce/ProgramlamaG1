@@ -204,6 +204,5 @@ namespace DevicesControllerApp
                 btnSettings.Text = "AYARLAR";
             }
         }
-
     }
 }
