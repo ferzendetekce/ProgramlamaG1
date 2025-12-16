@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\DevicesControllerApp",
+    "\\DevicesControllerApp\\Ana ekran-Login",
+    "\\DevicesControllerApp\\Ayarlar",
+    "\\DevicesControllerApp\\Database"
   ],
-  "SelectedNode": "\\DevicesControllerApp.sln",
+  "SelectedNode": "\\DevicesControllerApp\\Ana ekran-Login\\login.cs",
   "PreviewInSolutionExplorer": false
 }
