@@ -36,9 +36,14 @@ namespace DevicesControllerApp
             // Ayarlar sayfası açılırken mevcut temayı ona da uygula (veya kontrol et)
             // Not: Settings kendi içinde Load'da varsayılanı seçiyor olabilir, 
             // ama arka plan rengini buradan da garantiye alabiliriz.
+
             if (_isDarkMode) s.BackColor = Color.FromArgb(45, 45, 48);
 
             YukleSayfa(s);
+
+
+            s.ApplyTheme(_isDarkMode);
+
         }
 
         // Sayfa yükleme işlemini tek bir metodda toplayalım (Kod tekrarını önlemek için)

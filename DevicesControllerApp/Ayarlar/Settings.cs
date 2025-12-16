@@ -77,6 +77,36 @@ namespace DevicesControllerApp.Ayarlar
 
 
 
+        public void ApplyTheme(bool isDark)
+        {
+            if (isDark)
+            {
+                this.BackColor = Color.FromArgb(45, 45, 48);
+
+                foreach (Control c in this.Controls)
+                {
+                    if (c is Label || c is CheckBox)
+                        c.ForeColor = Color.White;
+
+                    if (c is Button btn)
+                    {
+                        btn.BackColor = Color.FromArgb(60, 60, 60);
+                        btn.ForeColor = Color.White;
+                    }
+                }
+            }
+            else
+            {
+                this.BackColor = Color.White;
+
+                foreach (Control c in this.Controls)
+                {
+                    c.ForeColor = Color.Black;
+                    if (c is Button btn)
+                        btn.BackColor = SystemColors.Control;
+                }
+            }
+        }
 
 
 
