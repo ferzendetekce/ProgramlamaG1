@@ -53,19 +53,26 @@ namespace DevicesControllerApp.Ayarlar
             OnLanguageChanged?.Invoke(lang);
         }
 
+        // Mevcut ComboBox5_SelectedIndexChanged metodunu bununla değiştirin:
+
         private void ComboBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // ComboBox5'te seçilen öğeyi alıyoruz (Light veya Dark)
             if (comboBox5.SelectedItem != null)
             {
                 string secilenTema = comboBox5.SelectedItem.ToString();
+
+                // Önce kendi (Settings) renklerini güncelle
                 TemaGuncelle(secilenTema);
 
-                bool isDarkMode = false;
+                // --- DÜZELTME BURADA ---
+                // Seçilen tema "Dark" ise true, değilse false olsun.
+                bool isDarkMode = (secilenTema == "Dark");
+
+                // Ana Forma doğru bilgiyi gönder
                 OnThemeChanged?.Invoke(isDarkMode);
             }
         }
-        
+
 
 
 
