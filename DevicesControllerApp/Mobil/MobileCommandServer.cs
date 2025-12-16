@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+// Yeni DeviceCommunication namespace'ini ekliyoruz
+using RehabilitationSystem.Communication;
 
 namespace RehabilitationSystem.Mobile
 {
@@ -45,6 +47,7 @@ namespace RehabilitationSystem.Mobile
             _listener = new TcpListener(IPAddress.Loopback, _port);
             _listener.Start();
 
+            // Arkaplanda dinleme döngüsünü başlat
             Task.Run(() => AcceptLoopAsync(_cts.Token));
         }
 
@@ -88,6 +91,7 @@ namespace RehabilitationSystem.Mobile
                         : "bilinmiyor";
 
                     OnClientConnected(endpoint);
+                    // Her istemciyi ayrı bir task'te işle
                     _ = Task.Run(() => HandleClientAsync(client, endpoint, token), token);
                 }
                 catch (OperationCanceledException)
@@ -144,6 +148,9 @@ namespace RehabilitationSystem.Mobile
             var payload = new { message = "Komut alındı" };
             var stateChanged = false;
 
+            // Cihaz iletişim referansı
+            var device = DeviceCommunication.Instance;
+
             try
             {
                 switch (lower)
@@ -154,85 +161,144 @@ namespace RehabilitationSystem.Mobile
                     case "status":
                         payload = new { message = "Durum alındı" };
                         break;
+
+                    // --- TERAPİ KONTROLLERİ ---
                     case "start":
-                        _sessionState.Start();
-                        stateChanged = true;
-                        payload = new { message = "Terapi başlatıldı" };
+                        if (device.StartTherapy()) // Cihaza gönder
+                        {
+                            _sessionState.Start();
+                            stateChanged = true;
+                            payload = new { message = "Terapi başlatıldı (Cihaz OK)" };
+                        }
+                        else
+                        {
+                            payload = new { message = "HATA: Cihaz başlatılamadı!" };
+                        }
                         break;
+
                     case "stop":
-                        _sessionState.Stop();
-                        stateChanged = true;
-                        payload = new { message = "Terapi durduruldu" };
+                        if (device.StopTherapy()) // Cihaza gönder
+                        {
+                            _sessionState.Stop();
+                            stateChanged = true;
+                            payload = new { message = "Terapi durduruldu (Cihaz OK)" };
+                        }
+                        else
+                        {
+                            payload = new { message = "HATA: Cihaz durdurulamadı!" };
+                        }
                         break;
+
                     case "pause":
-                        _sessionState.Pause();
-                        stateChanged = true;
-                        payload = new { message = "Terapi bekletildi" };
+                        if (device.PauseTherapy())
+                        {
+                            _sessionState.Pause();
+                            stateChanged = true;
+                            payload = new { message = "Terapi bekletildi" };
+                        }
                         break;
+
                     case "resume":
-                        _sessionState.Resume();
-                        stateChanged = true;
-                        payload = new { message = "Terapi devam ediyor" };
+                        if (device.ResumeTherapy())
+                        {
+                            _sessionState.Resume();
+                            stateChanged = true;
+                            payload = new { message = "Terapi devam ediyor" };
+                        }
                         break;
+
                     case "emergencystop":
+                        device.EmergencyStop(); // Kritik işlem, yanıt beklemeden state güncelle
                         _sessionState.Emergency();
                         stateChanged = true;
-                        payload = new { message = "Acil durdurma tetiklendi" };
+                        payload = new { message = "ACİL DURDURMA TETİKLENDİ!" };
                         break;
-                    case "up":
-                        _sessionState.MarkMovement("Vinc Yukari");
-                        stateChanged = true;
-                        payload = new { message = "Vinc yukari komutu alindi" };
+
+                    // --- VİNÇ VE MOTOR KONTROLLERİ ---
+                    case "up": // Vinç Yukarı
+                        if (device.SetWinchPosition(true))
+                        {
+                            _sessionState.MarkMovement("Vinc Yukari");
+                            stateChanged = true;
+                            payload = new { message = "Vinc yukari komutu iletildi" };
+                        }
                         break;
-                    case "down":
-                        _sessionState.MarkMovement("Vinc Asagi");
-                        stateChanged = true;
-                        payload = new { message = "Vinc asagi komutu alindi" };
+
+                    case "down": // Vinç Aşağı
+                        if (device.SetWinchPosition(false))
+                        {
+                            _sessionState.MarkMovement("Vinc Asagi");
+                            stateChanged = true;
+                            payload = new { message = "Vinc asagi komutu iletildi" };
+                        }
                         break;
+
                     case "left":
+                        // Sol motor (Örn: Motor Index 1)
+                        // device.MoveMotor(1, 100); 
                         _sessionState.MarkMovement("Sola Hareket");
                         payload = new { message = "Sola hareket komutu alındı" };
                         break;
+
                     case "right":
+                        // Sağ motor (Örn: Motor Index 1, -100)
+                        // device.MoveMotor(1, -100);
                         _sessionState.MarkMovement("Sağa Hareket");
                         payload = new { message = "Sağa hareket komutu alındı" };
                         break;
+
+                    // --- AYAR KONTROLLERİ ---
                     case "footincrease":
                         _sessionState.IncreaseShoeSize();
+                        device.SetShoeSize(_sessionState.ShoeSize); // Cihaza yeni numarayı gönder
                         stateChanged = true;
-                        payload = new { message = "Ayak numarası büyütüldü" };
+                        payload = new { message = $"Ayak numarası büyütüldü: {_sessionState.ShoeSize}" };
                         break;
+
                     case "footdecrease":
                         _sessionState.DecreaseShoeSize();
+                        device.SetShoeSize(_sessionState.ShoeSize); // Cihaza yeni numarayı gönder
                         stateChanged = true;
-                        payload = new { message = "Ayak numarası küçültüldü" };
+                        payload = new { message = $"Ayak numarası küçültüldü: {_sessionState.ShoeSize}" };
                         break;
+
                     case "barup":
                         _sessionState.MoveSupportBar(true);
+                        device.SetSupportBarHeight(_sessionState.SupportBarHeight); // Cihaza gönder
                         stateChanged = true;
                         payload = new { message = "Destek barı yükseltildi" };
                         break;
+
                     case "bardown":
                         _sessionState.MoveSupportBar(false);
+                        device.SetSupportBarHeight(_sessionState.SupportBarHeight); // Cihaza gönder
                         stateChanged = true;
                         payload = new { message = "Destek barı alçaltıldı" };
                         break;
+
                     case "weightincrease":
                         _sessionState.AdjustWeight(true);
+                        device.SetWeightReduction(_sessionState.WeightSupport); // Cihaza gönder
                         stateChanged = true;
                         payload = new { message = "Ağırlık azaltma artırıldı" };
                         break;
+
                     case "weightdecrease":
                         _sessionState.AdjustWeight(false);
+                        device.SetWeightReduction(_sessionState.WeightSupport); // Cihaza gönder
                         stateChanged = true;
                         payload = new { message = "Ağırlık azaltma düşürüldü" };
                         break;
+
                     case "disconnect":
                         _sessionState.Stop();
+                        // Mobil bağlantıyı keserken cihazı durdurmak isteyebiliriz:
+                        // device.StopTherapy(); 
                         stateChanged = true;
                         payload = new { message = "Bağlantı kesildi" };
                         OnClientDisconnected("disconnect");
                         break;
+
                     default:
                         return _serializer.Serialize(new
                         {
@@ -242,12 +308,13 @@ namespace RehabilitationSystem.Mobile
                         });
                 }
 
+                // Mobil uygulamaya JSON formatında yanıt dönüyoruz
                 var response = _serializer.Serialize(new
                 {
                     status = "ok",
                     command = lower,
                     data = payload,
-                    therapy = _sessionState.ToTransportModel(),
+                    therapy = _sessionState.ToTransportModel(), // Güncel durumu da gönder
                     timestamp = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)
                 });
 
@@ -320,6 +387,7 @@ namespace RehabilitationSystem.Mobile
         }
     }
 
+    // Mobil uygulama için durum (state) tutan yardımcı sınıf
     public class TherapySessionState
     {
         private readonly CultureInfo _culture = CultureInfo.InvariantCulture;
@@ -465,6 +533,3 @@ namespace RehabilitationSystem.Mobile
         }
     }
 }
-
-
-
