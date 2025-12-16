@@ -28,34 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
-            // checkBox1
+            // Service
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.checkBox1.Location = new System.Drawing.Point(397, 271);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(500, 77);
-            this.checkBox1.TabIndex = 0;
-            this.checkBox1.Text = "Servis İşlemleri";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // Servis
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.checkBox1);
-            this.Name = "Servis";
-            this.Size = new System.Drawing.Size(1280, 697);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Name = "Service";
+            this.Size = new System.Drawing.Size(1707, 858);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

@@ -3,18 +3,6 @@
   "WorkspaceRootPath": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ayarlar\\settings.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
@@ -23,8 +11,56 @@
       "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\cihaz haberlesme protokolleri\\devicecommunication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\cihaz haberlesme protokolleri\\devicecommunication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\database\\databasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\database\\databasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\hasta kayit\\patientregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\hasta kayit\\patientregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\kullanici\\userregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\kullanici\\userregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\mobil\\mobileservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\mobil\\mobileservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\motivasyon oyunu\\gameservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\motivasyon oyunu\\gameservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\raporlama\\reports.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\servis\\service.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\servis\\service.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\terapi\\therapy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\terapi\\therapy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\veri izleme\\datamonitoring.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\veri izleme\\datamonitoring.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|c:\\visualstudyocsharp\\form\\programlamag1\\devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ana ekran-login\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\devicescontrollerapp\\ayarlar\\settings.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3745AF9D-2648-409B-AA0E-B058279214E9}|DevicesControllerApp\\DevicesControllerApp.csproj|solutionrelative:devicescontrollerapp\\ayarlar\\settings.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -70,31 +106,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MainForm.cs",
-              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
-              "RelativeDocumentMoniker": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
-              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
-              "RelativeToolTip": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAAwIEAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "PatientRegistration.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Hasta kayit\\PatientRegistration.cs [Design]*",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-16T05:35:28.927Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-16T07:29:55.476Z",
+              "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "MainForm.cs [Design]",
-              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
-              "RelativeDocumentMoniker": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
-              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]",
-              "RelativeToolTip": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-16T05:35:24.356Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
               "Title": "DatabaseManager.cs",
               "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Database\\DatabaseManager.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Database\\DatabaseManager.cs",
@@ -102,11 +126,148 @@
               "RelativeToolTip": "DevicesControllerApp\\Database\\DatabaseManager.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-15T13:12:40.237Z"
+              "WhenOpened": "2025-12-15T13:12:40.237Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "DeviceCommunication.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Cihaz Haberlesme Protokolleri\\DeviceCommunication.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Cihaz Haberlesme Protokolleri\\DeviceCommunication.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Cihaz Haberlesme Protokolleri\\DeviceCommunication.cs",
+              "RelativeToolTip": "DevicesControllerApp\\Cihaz Haberlesme Protokolleri\\DeviceCommunication.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:29:50.462Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Settings.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs [Design]",
+              "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T10:18:54.734Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainForm.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T05:35:24.356Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UserRegistration.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Kullanici\\UserRegistration.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Kullanici\\UserRegistration.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Kullanici\\UserRegistration.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Kullanici\\UserRegistration.cs [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:30:09.547Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MobileService.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Mobil\\MobileService.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Mobil\\MobileService.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Mobil\\MobileService.cs",
+              "RelativeToolTip": "DevicesControllerApp\\Mobil\\MobileService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:30:32.725Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "GameService.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Motivasyon Oyunu\\GameService.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Motivasyon Oyunu\\GameService.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Motivasyon Oyunu\\GameService.cs",
+              "RelativeToolTip": "DevicesControllerApp\\Motivasyon Oyunu\\GameService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:30:36.926Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Reports.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Raporlama\\Reports.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Raporlama\\Reports.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Raporlama\\Reports.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Raporlama\\Reports.cs [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:30:39.387Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Service.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Servis\\Service.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Servis\\Service.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Servis\\Service.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Servis\\Service.cs [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:30:46.929Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Therapy.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Terapi\\Therapy.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Terapi\\Therapy.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Terapi\\Therapy.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Terapi\\Therapy.cs [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:31:24.185Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "DataMonitoring.cs [Design]",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Veri izleme\\DataMonitoring.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Veri izleme\\DataMonitoring.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Veri izleme\\DataMonitoring.cs [Design]*",
+              "RelativeToolTip": "DevicesControllerApp\\Veri izleme\\DataMonitoring.cs [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T07:31:32.408Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "RelativeDocumentMoniker": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ana ekran-Login\\MainForm.cs*",
+              "RelativeToolTip": "DevicesControllerApp\\Ana ekran-Login\\MainForm.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T05:35:28.927Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
               "Title": "Settings.Designer.cs",
               "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.Designer.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.Designer.cs",
@@ -119,28 +280,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 13,
               "Title": "Settings.cs",
               "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
               "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.cs",
-              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs*",
-              "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.cs*",
-              "ViewState": "AgIAABcAAAAAAAAAAAAYwGcAAAAJAAAAAAAAAA==",
+              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.cs",
+              "ViewState": "AgIAAEEAAAAAAAAAAAAowGcAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-15T10:19:19.013Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Settings.cs [Design]",
-              "DocumentMoniker": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs",
-              "RelativeDocumentMoniker": "DevicesControllerApp\\Ayarlar\\Settings.cs",
-              "ToolTip": "C:\\VisualStudyoCSharp\\Form\\ProgramlamaG1\\DevicesControllerApp\\Ayarlar\\Settings.cs [Design]*",
-              "RelativeToolTip": "DevicesControllerApp\\Ayarlar\\Settings.cs [Design]*",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-15T10:18:54.734Z",
-              "EditorCaption": " [Design]"
             }
           ]
         }
