@@ -12,6 +12,13 @@ namespace DevicesControllerApp.Ayarlar
 {
     public partial class Settings : UserControl
     {
+
+
+        public event Action<string> OnLanguageChanged;
+        public event Action<bool> OnThemeChanged;
+
+
+
         public Settings()
         {
             InitializeComponent();
@@ -19,19 +26,117 @@ namespace DevicesControllerApp.Ayarlar
             // Dil değişimi olayını (Event) bağlıyoruz
             if (comboBox1 != null)
                 comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
+
+            // Tema değişimi olayını (Event) bağlıyoruz
+            if (comboBox5 != null)
+                comboBox5.SelectedIndexChanged += ComboBox5_SelectedIndexChanged;
         }
 
         private void Settings_Load(object sender, EventArgs e)
         {
-            // Varsayılan dil Türkçe
+            // Varsayılan dil: Türkçe (Index 0)
             if (comboBox1.Items.Count > 0)
                 comboBox1.SelectedIndex = 0;
+
+            // Varsayılan tema: Light (Index 0)
+            // Eğer daha önce seçilmediyse varsayılan olarak 0 (Light) seçelim.
+            if (comboBox5.Items.Count > 0)
+                comboBox5.SelectedIndex = 0;
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             string lang = comboBox1.SelectedIndex == 1 ? "en" : "tr";
             DiliGuncelle(lang);
+
+            // 2. Olayı Tetikle (MainForm'a haber ver)
+            OnLanguageChanged?.Invoke(lang);
+        }
+
+        private void ComboBox5_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // ComboBox5'te seçilen öğeyi alıyoruz (Light veya Dark)
+            if (comboBox5.SelectedItem != null)
+            {
+                string secilenTema = comboBox5.SelectedItem.ToString();
+                TemaGuncelle(secilenTema);
+
+                bool isDarkMode = false;
+                OnThemeChanged?.Invoke(isDarkMode);
+            }
+        }
+        
+
+
+
+
+
+
+
+
+        private void TemaGuncelle(string tema)
+        {
+            Color arkaPlanRengi;
+            Color yaziRengi;
+            Color panelRengi;
+
+            // Koyu (Dark) veya Açık (Light) tema renklerini belirle
+            if (tema == "Dark")
+            {
+                arkaPlanRengi = Color.FromArgb(45, 45, 48); // Koyu Gri
+                panelRengi = Color.FromArgb(30, 30, 30);    // Daha Koyu Gri
+                yaziRengi = Color.White;
+            }
+            else
+            {
+                // Varsayılan Light Tema
+                arkaPlanRengi = Color.LightGray;
+                panelRengi = Color.WhiteSmoke;
+                yaziRengi = Color.Black;
+            }
+
+            // 1. Ana UserControl arka planını değiştir
+            this.BackColor = arkaPlanRengi;
+            this.ForeColor = yaziRengi;
+
+            // 2. TabControl ve içindeki sayfaları gezerek renkleri güncelle
+            if (tabControl1 != null)
+            {
+                tabControl1.BackColor = arkaPlanRengi;
+
+                foreach (TabPage page in tabControl1.TabPages)
+                {
+                    page.BackColor = panelRengi;
+                    page.ForeColor = yaziRengi;
+                    page.UseVisualStyleBackColor = false; // Rengi değiştirebilmek için false olmalı
+
+                    // Sayfa içindeki her bir kontrolü (Label, Checkbox vb.) gez
+                    foreach (Control item in page.Controls)
+                    {
+                        // Label, CheckBox ve RadioButton yazı renklerini güncelle
+                        if (item is Label || item is CheckBox || item is RadioButton)
+                        {
+                            item.ForeColor = yaziRengi;
+                        }
+                        // Butonların renklerini güncelle
+                        else if (item is Button btn)
+                        {
+                            if (tema == "Dark")
+                            {
+                                btn.BackColor = Color.Gray;
+                                btn.ForeColor = Color.White;
+                                btn.FlatStyle = FlatStyle.Flat; // Daha modern görünüm için
+                            }
+                            else
+                            {
+                                btn.BackColor = Color.White; // Veya varsayılan buton rengi
+                                btn.ForeColor = Color.Black;
+                                btn.FlatStyle = FlatStyle.Standard;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void DiliGuncelle(string lang)

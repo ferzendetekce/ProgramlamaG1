@@ -24,16 +24,116 @@ namespace DevicesControllerApp
             InitializeComponent();
         }
 
+
+
         private void btnSettings_Click(object sender, EventArgs e)
         {
             Settings s = new Settings();
             // Make the UserControl fill the entire panel
+
+            s.OnLanguageChanged += ApplyLanguage;
+            s.OnThemeChanged += ApplyTheme;
+
+
             s.Dock = DockStyle.Fill;
             s.Margin = Padding.Empty;
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(s);
             s.BringToFront();
         }
+
+
+
+        // TÜM UYGULAMA İÇİN DİL DEĞİŞTİRME METODU
+        public void ApplyLanguage(string lang)
+        {
+            if (lang == "en")
+            {
+                // Sol Menü Butonları - İngilizce
+                btnTherapy.Text = "THERAPY";
+                btnPatient.Text = "PATIENT REGISTRATION";
+                btnUsers.Text = "USER REGISTRATION";
+                btnMonitoring.Text = "DATA MONITORING";
+                btnReports.Text = "REPORTS";
+                btnService.Text = "SERVICE";
+                btnSettings.Text = "SETTINGS";
+
+                // Buraya Main form üzerindeki diğer labelları da ekleyebilirsiniz.
+            }
+            else
+            {
+                // Sol Menü Butonları - Türkçe
+                btnTherapy.Text = "TERAPİ";
+                btnPatient.Text = "HASTA KAYIT";
+                btnUsers.Text = "KULLANICI KAYIT";
+                btnMonitoring.Text = "REHABİLİTASYON İZLEME";
+                btnReports.Text = "RAPORLAMA";
+                btnService.Text = "SERVİS";
+                btnSettings.Text = "AYARLAR";
+            }
+        }
+
+
+
+
+        // TÜM UYGULAMA İÇİN TEMA DEĞİŞTİRME METODU
+        public void ApplyTheme(bool isDark)
+        {
+            Color panelColor;
+            Color buttonColor;
+            Color textColor;
+
+            if (isDark) // Koyu Tema
+            {
+                panelColor = Color.FromArgb(30, 30, 30); // Koyu Gri/Siyah
+                buttonColor = Color.FromArgb(50, 50, 50);
+                textColor = Color.White;
+            }
+            else // Açık Tema (Varsayılan renklerinizi buraya yazın)
+            {
+                panelColor = Color.SandyBrown; // Designer'da görülen renk
+                buttonColor = SystemColors.Control; // Veya butonun orijinal rengi
+                textColor = Color.Black;
+            }
+
+            // 1. Ana Panelleri Boya
+            this.BackColor = panelColor;
+            splitContainer1.Panel1.BackColor = panelColor; // Sol Menü Paneli
+            splitContainer2.Panel1.BackColor = SystemColors.Info; // Üst bilgi paneli (isterseniz bunu da değiştirin)
+            splitContainer2.Panel2.BackColor = panelColor; // İçerik paneli
+
+            // 2. Sol Menü Butonlarını Boya
+            ChangeButtonTheme(btnTherapy, buttonColor, textColor);
+            ChangeButtonTheme(btnPatient, buttonColor, textColor);
+            ChangeButtonTheme(btnUsers, buttonColor, textColor);
+            ChangeButtonTheme(btnMonitoring, buttonColor, textColor);
+            ChangeButtonTheme(btnReports, buttonColor, textColor);
+            ChangeButtonTheme(btnService, buttonColor, textColor);
+            ChangeButtonTheme(btnSettings, buttonColor, textColor);
+
+            // Alt butonlar (button8, button9...)
+            ChangeButtonTheme(button8, buttonColor, textColor);
+            ChangeButtonTheme(button9, buttonColor, textColor);
+            ChangeButtonTheme(button10, buttonColor, textColor);
+            ChangeButtonTheme(button11, buttonColor, textColor);
+        }
+
+
+
+
+        // Yardımcı metod: Buton renklerini değiştirmek için
+        private void ChangeButtonTheme(Button btn, Color backColor, Color foreColor)
+        {
+            btn.BackColor = backColor;
+            btn.ForeColor = foreColor;
+            btn.FlatStyle = FlatStyle.Flat; // Daha modern görünüm için
+            btn.FlatAppearance.BorderColor = foreColor;
+        }
+
+
+
+
+
 
         private void btnPatient_Click(object sender, EventArgs e)
         {
