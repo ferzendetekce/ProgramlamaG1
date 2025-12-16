@@ -193,7 +193,7 @@ namespace DevicesControllerApp
 
         private void button10_Click(object sender, EventArgs e)
         {
-            // Boş
+            
         }
 
         // Form kapanırken bağlantıyı temizle
