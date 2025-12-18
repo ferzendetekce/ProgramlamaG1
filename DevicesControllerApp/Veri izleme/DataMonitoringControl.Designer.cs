@@ -74,7 +74,7 @@
             this.label1.Font = new System.Drawing.Font("Tahoma", 20F);
             this.label1.Location = new System.Drawing.Point(460, 17);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(178, 33);
+            this.label1.Size = new System.Drawing.Size(226, 41);
             this.label1.TabIndex = 0;
             this.label1.Text = "VERİ İZLEME ";
             // 
@@ -268,7 +268,7 @@
             "English"});
             this.cmbLanguage.Location = new System.Drawing.Point(941, 66);
             this.cmbLanguage.Name = "cmbLanguage";
-            this.cmbLanguage.Size = new System.Drawing.Size(121, 21);
+            this.cmbLanguage.Size = new System.Drawing.Size(121, 24);
             this.cmbLanguage.TabIndex = 3;
             this.cmbLanguage.SelectedIndexChanged += new System.EventHandler(this.cmbLanguage_SelectedIndexChanged);
             // 
@@ -277,7 +277,7 @@
             this.lblStepCount.AutoSize = true;
             this.lblStepCount.Location = new System.Drawing.Point(60, 258);
             this.lblStepCount.Name = "lblStepCount";
-            this.lblStepCount.Size = new System.Drawing.Size(73, 13);
+            this.lblStepCount.Size = new System.Drawing.Size(92, 17);
             this.lblStepCount.TabIndex = 5;
             this.lblStepCount.Text = "Adım Sayısı: 0";
             // 

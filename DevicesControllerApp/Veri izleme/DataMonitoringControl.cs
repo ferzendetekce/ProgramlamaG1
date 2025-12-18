@@ -10,7 +10,6 @@ namespace DevicesControllerApp.Veri_izleme
     {
         private const int StepPoints = 100;
         private Timer timer;
-        private Random rnd = new Random();
 
         private double[] rightHeel = new double[StepPoints];
         private double[] leftHeel = new double[StepPoints];
@@ -46,7 +45,6 @@ namespace DevicesControllerApp.Veri_izleme
             InitCharts();
         }
 
-        // ------------------ UI Styling ------------------
         private void StyleChart(Chart ch)
         {
             ch.BackColor = Color.White;
@@ -123,11 +121,11 @@ namespace DevicesControllerApp.Veri_izleme
         // ------------------ DATA UPDATE (20 FPS) -----------------
         private void Timer_Tick(object sender, EventArgs e)
         {
-            double v1 = rnd.Next(10, 100);
-            double v2 = rnd.Next(10, 100);
-            double v3 = rnd.Next(10, 100);
-            double v4 = rnd.Next(10, 100);
-            double vb = rnd.Next(10, 100);
+            double v1 = 0;
+            double v2 = 0;
+            double v3 = 0;
+            double v4 = 0;
+            double vb = 0;
 
             rightHeel[pointIndex] = v1;
             leftHeel[pointIndex] = v2;
