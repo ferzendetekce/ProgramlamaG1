@@ -1,35 +1,98 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Drawing; 
-using DevicesControllerApp.Core; // DeviceManager için
+using DevicesControllerApp.Core;
 using System.Collections.Generic;
+using DevicesControllerApp.Database;
 
 namespace DevicesControllerApp.Servis
 {
-    // Sınıf Adı: Service
     public partial class Service : UserControl
     {
         private DeviceManager _deviceManager;
+        private DatabaseManager _dbManager; 
         private System.Windows.Forms.Timer _readTimer; 
+        private int _currentLanguageId = 0;
 
         public Service()
         {
             InitializeComponent();
-            
             _deviceManager = new DeviceManager();
-            TryConnectDevices();
+            _dbManager = new DatabaseManager(); 
             
+            TryConnectDevices();
             SetupReadingTimer(); 
+            UpdateLanguage(0); 
         }
 
-        // Cihaz Bağlantısını Yöneten Metot
+        public void UpdateLanguage(int langId)
+        {
+            _currentLanguageId = langId;
+            
+            if (langId == 1) 
+            {
+                btnServoMove.Text = "Move Motor";
+                btnHomingAll.Text = "Homing All";
+                btnCalibration.Text = "Calibrate";
+                lblLoadCellTitle.Text = "Weight:";
+            }
+            else if (langId == 2) 
+            {
+                btnServoMove.Text = "تحريك المحرك";
+                btnHomingAll.Text = "إعادة التعيين";
+                btnCalibration.Text = "معايرة";
+                lblLoadCellTitle.Text = "وزن:";
+            }
+            else 
+            {
+                btnServoMove.Text = "Motoru Hareket Ettir";
+                btnHomingAll.Text = "Homing Başlat";
+                btnCalibration.Text = "Kalibrasyon";
+                lblLoadCellTitle.Text = "Ağırlık:";
+            }
+        }
+
+        private void btnServoMove_Click(object sender, EventArgs e)
+        {
+            if (!_deviceManager.IsConnected)
+            {
+                ShowStatusMessage("Cihaz bağlı değil! / Device not connected!", true);
+                return;
+            }
+
+            try
+            {
+                if (int.TryParse(txtServoSpeed.Text, out int speed) && int.TryParse(txtServoDistance.Text, out int distance))
+                {
+                    string result = _deviceManager.MoveMotorManual("Servo_1", speed, distance);
+                    
+                    if (result == "SUCCESS") {
+                        lblMotorStatus.Text = _currentLanguageId == 0 ? "İşlem Başarılı" : "Success";
+                        lblMotorStatus.ForeColor = Color.Green;
+                    }
+                    else if (result == "TIMEOUT") {
+                        ShowStatusMessage("Zaman aşımı hatası! (Timeout Error)", true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("COM Port Hatası: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void ShowStatusMessage(string message, bool isError)
+        {
+            lblMotorStatus.Text = message;
+            lblMotorStatus.ForeColor = isError ? Color.Red : Color.Black;
+        }
+
         private void TryConnectDevices()
         {
             try
             {
                 if (_deviceManager.Connect("COM3")) 
                 {
-                    // Bağlantı başarılıysa burada bir loglama yapılabilir.
                 }
             }
             catch (Exception ex)
@@ -38,7 +101,6 @@ namespace DevicesControllerApp.Servis
             }
         }
         
-        // LoadCell ve Limit Switch Anlık Okuma için Timer Kurulumu
         private void SetupReadingTimer()
         {
             _readTimer = new System.Windows.Forms.Timer();
@@ -47,16 +109,12 @@ namespace DevicesControllerApp.Servis
             _readTimer.Start();
         }
 
-        // Timer her tick ettiğinde çalışacak metot
         private void ReadData_Tick(object sender, EventArgs e)
         {
             if (_deviceManager.IsConnected)
             {
-                // LoadCell anlık okuma
                 double loadValue = _deviceManager.ReadLoadCellValue();
                 lblLoadCellValue.Text = $"{loadValue:F2} kg";
-                
-                // Limit Switch durumlarını okuma
                 UpdateLimitSwitchDisplay(_deviceManager.GetLimitSwitchStatus());
             }
             else
@@ -65,10 +123,8 @@ namespace DevicesControllerApp.Servis
             }
         }
         
-        // Limit Switch Arayüzünü Güncelleyen Metot
         private void UpdateLimitSwitchDisplay(Dictionary<string, bool> statuses)
         {
-            // X Min Limit Switch'i güncelleme
             if (statuses.ContainsKey("X_MIN"))
             {
                 bool isActive = statuses["X_MIN"];
@@ -76,7 +132,6 @@ namespace DevicesControllerApp.Servis
                 lblLSXMin.Text = $"X Min {(isActive ? "AKTİF" : "PASİF")}";
             }
             
-            // X Max Limit Switch'i güncelleme
             if (statuses.ContainsKey("X_MAX"))
             {
                 bool isActive = statuses["X_MAX"];
@@ -84,79 +139,9 @@ namespace DevicesControllerApp.Servis
                 lblLSXMax.Text = $"X Max {(isActive ? "AKTİF" : "PASİF")}";
             }
         }
-        
-        /* --- OLAY İŞLEYİCİLERİ --- */
 
-        // Manuel Motor Kontrolü
-        private void btnServoMove_Click(object sender, EventArgs e)
-        {
-            if (!_deviceManager.IsConnected)
-            {
-                MessageBox.Show("Cihaz bağlı değil!", "Hata");
-                return;
-            }
-
-            try
-            {
-                if (int.TryParse(txtServoSpeed.Text, out int speed) && int.TryParse(txtServoDistance.Text, out int distance))
-                {
-                    _deviceManager.MoveMotorManual("Servo_1", speed, distance);
-                    lblMotorStatus.Text = $"Servo 1: Hız={speed}, Mesafe={distance} ile hareket başladı.";
-                }
-                else
-                {
-                    MessageBox.Show("Lütfen geçerli sayısal değerler girin.", "Giriş Hatası");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Motor hareketinde hata: " + ex.Message, "İletişim Hatası");
-            }
-        }
-
-        // Homing (Sıfırlama) İşlemi
-        private void btnHomingAll_Click(object sender, EventArgs e)
-        {
-            if (!_deviceManager.IsConnected)
-            {
-                MessageBox.Show("Cihaz bağlı değil!", "Hata");
-                return;
-            }
-            try
-            {
-                _deviceManager.StartHoming("ALL_AXES"); 
-                MessageBox.Show("Tüm eksenlerde sıfırlama (Homing) başlatıldı.", "İşlem Başlatıldı");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Homing işleminde hata: " + ex.Message, "İletişim Hatası");
-            }
-        }
-
-        // Kalibrasyon İşlemi
-        private void btnCalibration_Click(object sender, EventArgs e)
-        {
-            if (!_deviceManager.IsConnected)
-            {
-                MessageBox.Show("Cihaz bağlı değil!", "Hata");
-                return;
-            }
-
-            try
-            {
-                _deviceManager.StartCalibration("LOADCELL_CALIBRATION");
-                MessageBox.Show("Sistem kalibrasyonu başlatıldı.", "İşlem Başlatıldı");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Kalibrasyon işleminde hata: " + ex.Message, "İletişim Hatası");
-            }
-        }
-        
-        // Kaynak Temizleme (Dispose)
         protected override void Dispose(bool disposing)
         {
-            // Timer'ı ve DeviceManager'ı temizle
             if (disposing)
             {
                 _readTimer?.Stop();

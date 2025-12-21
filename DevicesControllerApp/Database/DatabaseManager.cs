@@ -348,6 +348,51 @@ namespace DevicesControllerApp.Database
             return false;
         }
 
+        public Dictionary<string, string> GetLanguageTexts(int langId, string screenName)
+        {
+            Dictionary<string, string> texts = new Dictionary<string, string>();
+            if (OpenConnection())
+            {
+                try
+                {
+                    string query = "SELECT key, text FROM dil_destegi WHERE lang_id = @langId AND screen = @screen";
+                    Npgsql.NpgsqlCommand cmd = new Npgsql.NpgsqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@langId", langId);
+                    cmd.Parameters.AddWithValue("@screen", screenName);
+
+                    using (Npgsql.NpgsqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            texts.Add(dr["key"].ToString(), dr["text"].ToString());
+                        }
+                    }
+                }
+                catch (Exception ex) { LogError(ex, "GetLanguageTexts"); }
+                finally { conn.Close(); }
+            }
+            return texts;
+        }
+
+        public bool LogDeviceCommand(string command, string result)
+        {
+            if (OpenConnection())
+            {
+                try
+                {
+                    string query = "INSERT INTO cihaz_loglari (komut, sonuc, zaman) VALUES (@cmd, @res, @time)";
+                    Npgsql.NpgsqlCommand cmd = new Npgsql.NpgsqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@cmd", command);
+                    cmd.Parameters.AddWithValue("@res", result);
+                    cmd.Parameters.AddWithValue("@time", DateTime.Now);
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+                catch (Exception ex) { LogError(ex, "LogDeviceCommand"); return false; }
+                finally { conn.Close(); }
+            }
+            return false;
+        }
         private void LogError(Exception ex, string methodName)
         {
             // Hata loglama
