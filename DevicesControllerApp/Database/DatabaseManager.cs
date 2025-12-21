@@ -11,17 +11,76 @@ namespace DevicesControllerApp.Database
 
     internal class DatabaseManager
     {
-   
+        static DatabaseManager instance = null;
+
+        internal static DatabaseManager Instance { 
+            get {
+                if ((instance==null))
+                {
+                    instance = new DatabaseManager();
+                }
+                return instance;
+            }
+        }
+
+        private string connectionString;
         private DatabaseManager()
         {
-            // Connection string yükleme
+            connectionString = "Server=localhost;Port=5432;Database=lokomat;User Id=postgres;Password=1234;";
         }
 
+        Npgsql.NpgsqlConnection conn;
         public bool OpenConnection()
         {
-            return false;
+            conn = new Npgsql.NpgsqlConnection(connectionString);
+            try
+            {
+                conn.Open();
+                if(conn.State == ConnectionState.Open)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
 
+        public DataTable GetAllCitys()
+        {
+            if (conn.State == ConnectionState.Open)
+            {
+                string query = "SELECT * FROM sehirler";
+                Npgsql.NpgsqlCommand cmd = new Npgsql.NpgsqlCommand(query, conn);
+                Npgsql.NpgsqlDataAdapter da = new Npgsql.NpgsqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+                return null;
+        }
+
+        public bool HastaSil(long tc)
+        {
+            string query = "DELETE FROM hastalar WHERE tc_kimlik_no=11122233344";
+            Npgsql.NpgsqlCommand cmd = new Npgsql.NpgsqlCommand(query, conn);
+            try
+            {
+                int result = cmd.ExecuteNonQuery();
+                if (result > 0)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+            
+        }
         public bool CloseConnection()
         {
             return false;

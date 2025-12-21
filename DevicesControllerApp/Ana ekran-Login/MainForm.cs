@@ -1,4 +1,5 @@
-﻿using DevicesControllerApp.Ayarlar;
+﻿using DevicesControllerApp.Ana_ekran_Login;
+using DevicesControllerApp.Ayarlar;
 using DevicesControllerApp.Hasta_kayit;
 using DevicesControllerApp.Kullanici;
 using DevicesControllerApp.Raporlama;
@@ -22,6 +23,9 @@ namespace DevicesControllerApp
         public MainForm()
         {
             InitializeComponent();
+            Login login = new Login();
+            login.ShowDialog();
+            this.Text = login.username;
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
