@@ -40,7 +40,7 @@ namespace RehabilitationSystem.Communication
         public bool IsConnected { get; private set; }
         public string CurrentPort { get; private set; }
         public int BaudRate { get; private set; }
-        public int CommandTimeout { get; set; } = 1000; // ms
+        public int CommandTimeout { get; set; } = 3000; // ms
 
         public bool SimulationMode { get; set; } = false; // Test için
 
@@ -70,7 +70,7 @@ namespace RehabilitationSystem.Communication
             _commandQueue = new Queue<byte[]>();
         }
 
-        public bool OpenPort(string portName, int baudRate = 9600, Parity parity = Parity.None,
+        public bool OpenPort(string portName, int baudRate = 115200, Parity parity = Parity.None,
     int dataBits = 8, StopBits stopBits = StopBits.One)
         {
             lock (_lock) // Thread safety için
@@ -220,14 +220,25 @@ namespace RehabilitationSystem.Communication
 
         private void DispatchReceivedPacket(byte commandCode, byte[] payload)
         {
+            // ✅ DEBUG: Gelen komut kodunu logla
+            LogCommunication($"[DEBUG] DispatchReceivedPacket: commandCode=0x{commandCode:X2}, payloadLen={payload?.Length ?? 0}");
+
             // Önce yanıt bekleyen var mı kontrol et
             lock (_responseLock)
             {
+                // ✅ DEBUG: Bekleyen waiter'ları logla
+                LogCommunication($"[DEBUG] Bekleyen waiter sayısı: {_responseWaiters.Count}");
+
                 if (_responseWaiters.ContainsKey(commandCode))
                 {
+                    LogCommunication($"[DEBUG] ✓ Waiter bulundu! Komut 0x{commandCode:X2}");
                     _responseData[commandCode] = payload;
-                    _responseWaiters[commandCode].Set(); // Bekleyeni uyandır
-                    return; // Event fırlatma, sadece bekleyene ver
+                    _responseWaiters[commandCode].Set();
+                    return;
+                }
+                else
+                {
+                    LogCommunication($"[DEBUG] ✗ Waiter BULUNAMADI! Komut 0x{commandCode:X2}", true);
                 }
             }
 
@@ -277,28 +288,34 @@ namespace RehabilitationSystem.Communication
             if (timeoutMs == 0)
                 timeoutMs = CommandTimeout;
 
+            ManualResetEvent waitHandle = null;
+
             try
             {
-                //  SİMÜLASYON MODU: Gerçek cihaz olmadan test
                 if (SimulationMode)
                 {
-                    LogCommunication($"[SİMÜLASYON] Komut 0x{commandCode:X2} gönderildi, sahte yanıt üretiliyor...");
-                    Thread.Sleep(100); // Gerçekçi gecikme
+                    LogCommunication($"[SİMÜLASYON] Komut 0x{commandCode:X2} gönderildi...");
+                    Thread.Sleep(100);
                     return GenerateSimulatedResponse(commandCode, data);
                 }
 
-                // Normal mod (gerçek cihazla)
-                ManualResetEvent waitHandle = new ManualResetEvent(false);
+                waitHandle = new ManualResetEvent(false);
 
+                // 1. Waiter'ı ekle
                 lock (_responseLock)
                 {
+                    LogCommunication($"[DEBUG] Waiter ekleniyor: 0x{commandCode:X2}");
                     _responseWaiters[commandCode] = waitHandle;
+
                     if (_responseData.ContainsKey(commandCode))
                         _responseData.Remove(commandCode);
                 }
 
+                // 2. Paketi gönder
+                LogCommunication($"[DEBUG] Paket gönderiliyor...");
                 if (!SendCommand(commandCode, data))
                 {
+                    LogCommunication($"[DEBUG] ✗ SendCommand başarısız!");
                     lock (_responseLock)
                     {
                         _responseWaiters.Remove(commandCode);
@@ -306,26 +323,44 @@ namespace RehabilitationSystem.Communication
                     return null;
                 }
 
+                LogCommunication($"[DEBUG] Paket gönderildi, yanıt bekleniyor (timeout: {timeoutMs}ms)...");
+
+                // 3. Yanıtı bekle
                 bool received = waitHandle.WaitOne(timeoutMs);
 
+                LogCommunication($"[DEBUG] Bekleme bitti: received={received}");
+
+                // 4. Yanıtı al ve waiter'ı temizle
                 lock (_responseLock)
                 {
-                    _responseWaiters.Remove(commandCode);
+                    _responseWaiters.Remove(commandCode);  // ← ÖNCE WAİTER'I SİL
 
                     if (received && _responseData.ContainsKey(commandCode))
                     {
                         byte[] response = _responseData[commandCode];
                         _responseData.Remove(commandCode);
+
+                        LogCommunication($"[DEBUG] ✓ Yanıt alındı! Uzunluk: {response.Length}");
                         return response;
                     }
                 }
 
-                LogCommunication($"TIMEOUT! Komut 0x{commandCode:X2} için {timeoutMs}ms içinde yanıt gelmedi.", true);
+                LogCommunication($"[ERROR] TIMEOUT! Komut 0x{commandCode:X2} için {timeoutMs}ms içinde yanıt gelmedi.", true);
                 return null;
             }
             catch (Exception ex)
             {
-                LogCommunication($"SendCommandAndWaitResponse hatası: {ex.Message}", true);
+                LogCommunication($"[ERROR] SendCommandAndWaitResponse hatası: {ex.Message}", true);
+
+                // Hata durumunda waiter'ı temizle
+                if (waitHandle != null)
+                {
+                    lock (_responseLock)
+                    {
+                        _responseWaiters.Remove(commandCode);
+                    }
+                }
+
                 return null;
             }
         }
@@ -740,7 +775,7 @@ namespace RehabilitationSystem.Communication
         {
             LogCommunication("Mevcut hız sorgulanıyor...");
 
-            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.GetSpeed, null, 1000);
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.GetSpeed, null, 3000);
 
             if (response != null && response.Length >= 4)
             {
@@ -895,7 +930,7 @@ namespace RehabilitationSystem.Communication
             payload.Add((byte)motorIndex);
             payload.AddRange(BitConverter.GetBytes(steps));
 
-            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.SetStepMotor, payload.ToArray(), 2000);
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.SetStepMotor, payload.ToArray(), 3000);
 
             if (response != null)
             {
@@ -914,7 +949,7 @@ namespace RehabilitationSystem.Communication
             LogCommunication($"Motor {motorIndex} pozisyonu sorgulanıyor...");
 
             byte[] motorIndexData = new byte[] { (byte)motorIndex };
-            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.GetMotorPosition, motorIndexData, 1000);
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.GetMotorPosition, motorIndexData, 3000);
 
             if (response != null && response.Length >= 4)
             {

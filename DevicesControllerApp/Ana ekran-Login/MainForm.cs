@@ -41,22 +41,25 @@ namespace DevicesControllerApp
         // --- TEST ORTAMI KURULUMU (SADECE KOD İLE) ---
         private void PrepareTestEnvironment()
         {
-            // A) Ekrana geçici bir Log kutusu ekle
+            // Log kutusu oluştur
             _debugLogBox = new ListBox();
-            _debugLogBox.Dock = DockStyle.Bottom; // Ekranın altına yapış
-            _debugLogBox.Height = 150;            // Yüksekliği 150px olsun
+            _debugLogBox.Dock = DockStyle.Bottom;
+            _debugLogBox.Height = 150;
             _debugLogBox.BackColor = Color.Black;
-            _debugLogBox.ForeColor = Color.Lime;  // Matrix yeşili :)
+            _debugLogBox.ForeColor = Color.Lime;
             _debugLogBox.Font = new Font("Consolas", 9);
 
-            // Kontrolü forma ekle ve en öne getir
             this.Controls.Add(_debugLogBox);
             _debugLogBox.BringToFront();
 
-            // B) Haberleşme Eventlerini Dinle (Veri Alma ve Buffer Testi)
             InitializeCommunicationEvents();
 
-            LogToScreen("TEST MODU AKTİF. Lütfen 'Buton10' ile bağlanın, 'Terapi' ile komut gönderin.");
+            // ✅ GERÇEK CİHAZ MODU (SİMÜLASYON KAPALI)
+            DeviceCommunication.Instance.SimulationMode = false;
+
+            LogToScreen("🔴 GERÇEK CİHAZ MODU AKTİF");
+            LogToScreen("STM32 F411 Nucleo bekleniyor...");
+            LogToScreen("Lütfen 'Button10' ile COM9 portunu açın.");
         }
 
         private void InitializeCommunicationEvents()
@@ -404,124 +407,123 @@ namespace DevicesControllerApp
                 return;
             }
 
-            LogToScreen("=== HIZ OKUMA VE DEĞİŞTİRME TESTİ ===");
-
-            // 1. Mevcut hızı oku
-            LogToScreen("1️⃣ Mevcut hız okunuyor...");
-            double currentSpeed = DeviceCommunication.Instance.GetCurrentSpeed();
-
-            if (currentSpeed >= 0)
+            // RUN THE TEST IN A BACKGROUND TASK TO AVOID DEADLOCK
+            Task.Run(() =>
             {
-                LogToScreen($"   ✓ Mevcut hız: {currentSpeed}");
-            }
-            else
-            {
-                LogToScreen($"   ✗ Hız okunamadı!");
-                return;
-            }
+                // We must use Invoke ONLY when updating UI from this task, 
+                // but LogToScreen handles that for us.
 
-            // 2. Yeni hız ayarla
-            double newSpeed = 75.5;
-            LogToScreen($"2️⃣ Yeni hız ayarlanıyor: {newSpeed}");
+                this.Invoke((MethodInvoker)delegate {
+                    LogToScreen("=== HIZ OKUMA VE DEĞİŞTİRME TESTİ ===");
+                    LogToScreen("1️⃣ Mevcut hız okunuyor...");
+                });
 
-            bool setResult = DeviceCommunication.Instance.SetSpeedWithConfirmation(newSpeed);
+                // This call blocks, but now it blocks the Task, not the UI!
+                double currentSpeed = DeviceCommunication.Instance.GetCurrentSpeed();
 
-            if (setResult)
-            {
-                LogToScreen($"   ✓ Hız başarıyla {newSpeed} olarak ayarlandı!");
-
-                // 3. Tekrar oku (doğrulama)
-                Thread.Sleep(100);
-                LogToScreen("3️⃣ Yeni hız doğrulanıyor...");
-
-                double verifySpeed = DeviceCommunication.Instance.GetCurrentSpeed();
-
-                if (verifySpeed >= 0)
-                {
-                    LogToScreen($"   ✓ Doğrulanan hız: {verifySpeed}");
-
-                    if (Math.Abs(verifySpeed - newSpeed) < 0.1)
-                    {
-                        LogToScreen("   🎉 HIZ DEĞİŞİKLİĞİ BAŞARILI!");
-                    }
+                this.Invoke((MethodInvoker)delegate {
+                    if (currentSpeed >= 0)
+                        LogToScreen($"   ✓ Mevcut hız: {currentSpeed}");
                     else
-                    {
-                        LogToScreen($"   ⚠️ Hız uyuşmazlığı! Ayarlanan: {newSpeed}, Okunan: {verifySpeed}");
-                    }
-                }
-            }
-            else
-            {
-                LogToScreen($"   ✗ Hız ayarlanamadı!");
-            }
+                        LogToScreen($"   ✗ Hız okunamadı!");
+                });
 
-            LogToScreen("=== TEST TAMAMLANDI ===");
+                // 2. Test Set Speed
+                double newSpeed = 75.5;
+                this.Invoke((MethodInvoker)delegate { LogToScreen($"2️⃣ Yeni hız ayarlanıyor: {newSpeed}"); });
+
+                bool setResult = DeviceCommunication.Instance.SetSpeedWithConfirmation(newSpeed);
+
+                this.Invoke((MethodInvoker)delegate {
+                    if (setResult)
+                        LogToScreen($"   ✓ Hız ayarlandı!");
+                    else
+                        LogToScreen($"   ✗ Hız ayarlanamadı!");
+
+                    LogToScreen("=== TEST TAMAMLANDI ===");
+                });
+            });
         }
-        
 
         private void button8_Click(object sender, EventArgs e)
         {
+            // Check connection on UI thread first
             if (!DeviceCommunication.Instance.IsConnected)
             {
                 LogToScreen("⚠️ Port açık değil! Önce Button10 ile port açın.");
                 return;
             }
 
-            LogToScreen("=== MOTOR HAREKET TESTİ ===");
-
-            int motorIndex = 1;
-
-            // 1. Başlangıç pozisyonunu oku
-            LogToScreen($"1️⃣ Motor {motorIndex} başlangıç pozisyonu okunuyor...");
-            int startPosition = DeviceCommunication.Instance.GetMotorPosition(motorIndex);
-
-            if (startPosition >= 0)
+            // --- MOVE LOGIC TO BACKGROUND THREAD TO PREVENT DEADLOCK ---
+            Task.Run(() =>
             {
-                LogToScreen($"   ✓ Başlangıç pozisyonu: {startPosition}");
-            }
-            else
-            {
-                LogToScreen($"   ✗ Pozisyon okunamadı!");
-                return;
-            }
+                this.Invoke((MethodInvoker)delegate {
+                    LogToScreen("=== MOTOR HAREKET TESTİ ===");
+                });
 
-            // 2. Motoru hareket ettir
-            int steps = 100;
-            LogToScreen($"2️⃣ Motor {motorIndex} → {steps} adım ilerletiliyor...");
+                int motorIndex = 1;
 
-            bool moveResult = DeviceCommunication.Instance.MoveMotor(motorIndex, steps);
+                // 1. Get Start Position
+                this.Invoke((MethodInvoker)delegate {
+                    LogToScreen($"1️⃣ Motor {motorIndex} başlangıç pozisyonu okunuyor...");
+                });
 
-            if (moveResult)
-            {
-                LogToScreen($"   ✓ Motor başarıyla hareket etti!");
+                // Blocking call (safe now because we are in Task.Run)
+                int startPosition = DeviceCommunication.Instance.GetMotorPosition(motorIndex);
 
-                // 3. Yeni pozisyonu oku
-                Thread.Sleep(200);
-                LogToScreen($"3️⃣ Yeni pozisyon okunuyor...");
+                this.Invoke((MethodInvoker)delegate {
+                    if (startPosition >= 0)
+                        LogToScreen($"   ✓ Başlangıç pozisyonu: {startPosition}");
+                    else
+                        LogToScreen($"   ✗ Pozisyon okunamadı!");
+                });
+
+                if (startPosition < 0) return; // Stop if read failed
+
+                // 2. Move Motor
+                int steps = 100;
+                this.Invoke((MethodInvoker)delegate {
+                    LogToScreen($"2️⃣ Motor {motorIndex} → {steps} adım ilerletiliyor...");
+                });
+
+                bool moveResult = DeviceCommunication.Instance.MoveMotor(motorIndex, steps);
+
+                this.Invoke((MethodInvoker)delegate {
+                    if (moveResult)
+                        LogToScreen($"   ✓ Motor başarıyla hareket etti!");
+                    else
+                        LogToScreen($"   ✗ Motor hareket ettirilemedi!");
+                });
+
+                if (!moveResult) return;
+
+                // 3. Verify New Position
+                Thread.Sleep(200); // Wait for physical movement (simulated)
+
+                this.Invoke((MethodInvoker)delegate {
+                    LogToScreen($"3️⃣ Yeni pozisyon okunuyor...");
+                });
 
                 int endPosition = DeviceCommunication.Instance.GetMotorPosition(motorIndex);
 
-                if (endPosition >= 0)
-                {
-                    LogToScreen($"   ✓ Yeni pozisyon: {endPosition}");
-                    LogToScreen($"   📊 Hareket: {startPosition} → {endPosition} ({endPosition - startPosition} adım)");
-
-                    if (endPosition - startPosition == steps)
+                this.Invoke((MethodInvoker)delegate {
+                    if (endPosition >= 0)
                     {
-                        LogToScreen("   🎉 MOTOR HAREKETİ BAŞARILI!");
+                        LogToScreen($"   ✓ Yeni pozisyon: {endPosition}");
+                        LogToScreen($"   📊 Hareket: {startPosition} → {endPosition} ({endPosition - startPosition} adım)");
+
+                        if (endPosition - startPosition == steps)
+                            LogToScreen("   🎉 MOTOR HAREKETİ BAŞARILI!");
+                        else
+                            LogToScreen($"   ⚠️ Pozisyon uyuşmazlığı! Beklenen: {steps}, Gerçek: {endPosition - startPosition}");
                     }
                     else
                     {
-                        LogToScreen($"   ⚠️ Pozisyon uyuşmazlığı! Beklenen: {steps}, Gerçek: {endPosition - startPosition}");
+                        LogToScreen($"   ✗ Yeni pozisyon okunamadı!");
                     }
-                }
-            }
-            else
-            {
-                LogToScreen($"   ✗ Motor hareket ettirilemedi!");
-            }
-
-            LogToScreen("=== TEST TAMAMLANDI ===");
+                    LogToScreen("=== TEST TAMAMLANDI ===");
+                });
+            });
         }
     }
 }
