@@ -196,7 +196,7 @@ namespace DevicesControllerApp
 
         private void button10_Click(object sender, EventArgs e)
         {
-            // Boş
+            
         }
 
         // Form kapanırken bağlantıyı temizle
@@ -445,7 +445,7 @@ namespace DevicesControllerApp
             });
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void button8_Click(object sender, EventArgs e)//
         {
             // Check connection on UI thread first
             if (!DeviceCommunication.Instance.IsConnected)
