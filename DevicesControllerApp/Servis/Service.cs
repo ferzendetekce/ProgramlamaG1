@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Drawing; 
-using DevicesControllerApp.Core;
+using System.Drawing;
 using System.Collections.Generic;
+using RehabilitationSystem.Communication;
 using DevicesControllerApp.Database;
 
 namespace DevicesControllerApp.Servis
 {
     public partial class Service : UserControl
     {
-        private DeviceManager _deviceManager;
-        private DatabaseManager _dbManager; 
-        private System.Windows.Forms.Timer _readTimer; 
+        private DeviceCommunication _comm = DeviceCommunication.Instance;
+        private DatabaseManager _dbManager = DatabaseManager.Instance;
+        private System.Windows.Forms.Timer _readTimer;
         private int _currentLanguageId = 0;
 
         public Service()
         {
             InitializeComponent();
-            _deviceManager = new DeviceManager();
-            _dbManager = new DatabaseManager(); 
-            
-            TryConnectDevices();
-            SetupReadingTimer(); 
-            UpdateLanguage(0); 
+            SetupReadingTimer();
+            UpdateLanguage(0);
         }
 
         public void UpdateLanguage(int langId)
@@ -54,9 +50,9 @@ namespace DevicesControllerApp.Servis
 
         private void btnServoMove_Click(object sender, EventArgs e)
         {
-            if (!_deviceManager.IsConnected)
+            if (!_comm.IsConnected)
             {
-                ShowStatusMessage("Cihaz bağlı değil! / Device not connected!", true);
+                ShowStatusMessage("Cihaz bağlı değil!", true);
                 return;
             }
 
@@ -64,21 +60,55 @@ namespace DevicesControllerApp.Servis
             {
                 if (int.TryParse(txtServoSpeed.Text, out int speed) && int.TryParse(txtServoDistance.Text, out int distance))
                 {
-                    string result = _deviceManager.MoveMotorManual("Servo_1", speed, distance);
+                    bool success = _comm.SetServoMotorPosition(0, distance);
                     
-                    if (result == "SUCCESS") {
-                        lblMotorStatus.Text = _currentLanguageId == 0 ? "İşlem Başarılı" : "Success";
+                    if (success) 
+                    {
+                        lblMotorStatus.Text = _currentLanguageId == 0 ? "Komut Gönderildi" : "Command Sent";
                         lblMotorStatus.ForeColor = Color.Green;
+                        _dbManager.LogDeviceCommand("SetServoMotor", "SUCCESS");
                     }
-                    else if (result == "TIMEOUT") {
-                        ShowStatusMessage("Zaman aşımı hatası! (Timeout Error)", true);
+                    else 
+                    {
+                        ShowStatusMessage("Komut başarısız!", true);
+                        _dbManager.LogDeviceCommand("SetServoMotor", "FAIL");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("COM Port Hatası: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Haberleşme Hatası: " + ex.Message);
             }
+        }
+
+        private void ReadData_Tick(object sender, EventArgs e)
+        {
+            if (_comm.IsConnected)
+            {
+                var packet = _comm.GetLatestLoadCellData();
+                if (packet != null)
+                {
+                    lblLoadCellValue.Text = $"{packet.WeightBalance:F2} kg";
+                }
+
+                bool[] switches = _comm.ReadLimitSwitches();
+                if (switches != null && switches.Length > 0)
+                {
+                    lblLSXMin.BackColor = switches[0] ? Color.Green : Color.Red;
+                    lblLSXMin.Text = $"X Min {(switches[0] ? "AKTİF" : "PASİF")}";
+                }
+            }
+            else
+            {
+                lblLoadCellValue.Text = "BAĞLANTI YOK";
+            }
+        }
+
+        private void SetupReadingTimer()
+        {
+            _readTimer = new System.Windows.Forms.Timer { Interval = 500 };
+            _readTimer.Tick += ReadData_Tick;
+            _readTimer.Start();
         }
 
         private void ShowStatusMessage(string message, bool isError)
@@ -87,71 +117,12 @@ namespace DevicesControllerApp.Servis
             lblMotorStatus.ForeColor = isError ? Color.Red : Color.Black;
         }
 
-        private void TryConnectDevices()
-        {
-            try
-            {
-                if (_deviceManager.Connect("COM3")) 
-                {
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Cihaz bağlantısı kurulamadı: " + ex.Message, "Bağlantı Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        
-        private void SetupReadingTimer()
-        {
-            _readTimer = new System.Windows.Forms.Timer();
-            _readTimer.Interval = 500; 
-            _readTimer.Tick += ReadData_Tick;
-            _readTimer.Start();
-        }
-
-        private void ReadData_Tick(object sender, EventArgs e)
-        {
-            if (_deviceManager.IsConnected)
-            {
-                double loadValue = _deviceManager.ReadLoadCellValue();
-                lblLoadCellValue.Text = $"{loadValue:F2} kg";
-                UpdateLimitSwitchDisplay(_deviceManager.GetLimitSwitchStatus());
-            }
-            else
-            {
-                lblLoadCellValue.Text = "BAĞLANTI YOK";
-            }
-        }
-        
-        private void UpdateLimitSwitchDisplay(Dictionary<string, bool> statuses)
-        {
-            if (statuses.ContainsKey("X_MIN"))
-            {
-                bool isActive = statuses["X_MIN"];
-                lblLSXMin.BackColor = isActive ? Color.Green : Color.Red;
-                lblLSXMin.Text = $"X Min {(isActive ? "AKTİF" : "PASİF")}";
-            }
-            
-            if (statuses.ContainsKey("X_MAX"))
-            {
-                bool isActive = statuses["X_MAX"];
-                lblLSXMax.BackColor = isActive ? Color.Green : Color.Red;
-                lblLSXMax.Text = $"X Max {(isActive ? "AKTİF" : "PASİF")}";
-            }
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 _readTimer?.Stop();
                 _readTimer?.Dispose();
-                _deviceManager?.Dispose();
-                
-                if (components != null)
-                {
-                    components.Dispose();
-                }
             }
             base.Dispose(disposing);
         }
