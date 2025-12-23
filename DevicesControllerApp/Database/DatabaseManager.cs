@@ -2,30 +2,46 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq; // List<> kullanabilmek için gerekli
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-
-
 
 namespace DevicesControllerApp.Database
 {
     public class DatabaseManager
     {
-        // Lütfen buradaki bilgileri kendi PostgreSQL kurulumunuza göre düzenleyin.
+        // 1. ADIM: Sınıfın kendi türünde statik bir değişken (instance) tutuyoruz.
+        private static DatabaseManager _instance;
+
+        // Veritabanı bağlantı cümlesi
         private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=1234;Database=mydb";
 
-        // Constructor'ı PUBLIC yaptık (Erişim hatası düzeldi)
-        public DatabaseManager()
+        // 2. ADIM: Constructor'ı PRIVATE yapıyoruz. 
+        // Böylece dışarıdan 'new DatabaseManager()' denilerek yeni nesne üretilmesi engellenir.
+        private DatabaseManager()
         {
-
         }
+
+        // 3. ADIM: Dışarıdan erişilecek tek nokta burasıdır.
+        // Eğer nesne daha önce oluşturulmamışsa oluşturur, varsa olanı gönderir.
+        public static DatabaseManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new DatabaseManager();
+                }
+                return _instance;
+            }
+        }
+
+        // --- Mevcut Metotlarınız (Aynen kalabilir) ---
 
         // Dil Ayarını Güncelleme Metodu
         public bool UpdateLanguage(string languageCode)
         {
-            // languageCode: 'tr' veya 'en' gelecek
+            // Mevcut kodunuzdaki mantık korunuyor
             string query = "UPDATE general_settings SET application_language = @lang WHERE id = 1";
 
             try
@@ -43,7 +59,6 @@ namespace DevicesControllerApp.Database
             }
             catch (Exception ex)
             {
-                // Hata olursa loglayabilir veya mesaj gösterebilirsiniz
                 System.Windows.Forms.MessageBox.Show("Dil veritabanına kaydedilemedi: " + ex.Message);
                 return false;
             }
@@ -52,7 +67,6 @@ namespace DevicesControllerApp.Database
         // Tema Ayarını Güncelleme Metodu
         public bool UpdateTheme(string themeName)
         {
-            // themeName: 'Light' veya 'Dark' gelecek
             string query = "UPDATE general_settings SET theme = @theme WHERE id = 1";
 
             try
@@ -75,9 +89,7 @@ namespace DevicesControllerApp.Database
             }
         }
 
-        // Diğer metodlar...
-        public bool OpenConnection() { return true; } // Basit kontrol için true dönebiliriz şimdilik
+        public bool OpenConnection() { return true; }
         public bool CloseConnection() { return true; }
     }
-
 }

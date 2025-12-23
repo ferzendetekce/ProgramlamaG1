@@ -13,12 +13,12 @@ namespace DevicesControllerApp.Ayarlar
 {
     public partial class Settings : UserControl
     {
-
-
         public event Action<string> OnLanguageChanged;
         public event Action<bool> OnThemeChanged;
 
-        private DatabaseManager dbManager = new DatabaseManager();
+        // DEĞİŞİKLİK BURADA:
+        // Artık "new" ile yeni oluşturmuyoruz. Ortak olan "Instance"ı alıyoruz.
+        private DatabaseManager dbManager = DatabaseManager.Instance;
 
         public Settings()
         {
@@ -38,13 +38,15 @@ namespace DevicesControllerApp.Ayarlar
             // Varsayılan dil: Türkçe (Index 0)
             if (comboBox1.Items.Count > 0)
                 comboBox1.SelectedIndex = 0;
-
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             string lang = comboBox1.SelectedIndex == 1 ? "en" : "tr";
+
             DiliGuncelle(lang);
+
+            // Singleton instance üzerinden veritabanı metodunu çağırıyoruz
             dbManager.UpdateLanguage(lang);
 
             // 2. Olayı Tetikle (MainForm'a haber ver)
@@ -52,7 +54,6 @@ namespace DevicesControllerApp.Ayarlar
         }
 
         // Mevcut ComboBox5_SelectedIndexChanged metodunu bununla değiştirin:
-
         private void ComboBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox5.SelectedItem != null)
@@ -61,9 +62,10 @@ namespace DevicesControllerApp.Ayarlar
 
                 // Önce kendi (Settings) renklerini güncelle
                 TemaGuncelle(secilenTema);
+
+                // Singleton instance üzerinden veritabanı metodunu çağırıyoruz
                 dbManager.UpdateTheme(secilenTema);
 
-                // --- DÜZELTME BURADA ---
                 // Seçilen tema "Dark" ise true, değilse false olsun.
                 bool isDarkMode = (secilenTema == "Dark");
 
@@ -71,8 +73,6 @@ namespace DevicesControllerApp.Ayarlar
                 OnThemeChanged?.Invoke(isDarkMode);
             }
         }
-
-
 
         public void ApplyTheme(bool isDark)
         {
@@ -105,8 +105,6 @@ namespace DevicesControllerApp.Ayarlar
                 comboBox5.SelectedIndexChanged += ComboBox5_SelectedIndexChanged;
             }
         }
-
-
 
         private void TemaGuncelle(string tema)
         {
