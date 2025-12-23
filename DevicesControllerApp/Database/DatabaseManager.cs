@@ -89,6 +89,46 @@ namespace DevicesControllerApp.Database
             }
         }
 
+
+
+
+
+
+
+
+
+
+        // Mevcut dili veritabanından çeken metot
+        public string GetLanguage()
+        {
+            string languageCode = "tr"; // Varsayılan değer
+            string query = "SELECT application_language FROM general_settings WHERE id = 1";
+
+            try
+            {
+                using (var conn = new NpgsqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new NpgsqlCommand(query, conn))
+                    {
+                        var result = cmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            languageCode = result.ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda varsayılanı ("tr") döner, isteğe bağlı loglayabilirsiniz.
+                System.Diagnostics.Debug.WriteLine("Dil okunamadı: " + ex.Message);
+            }
+
+            return languageCode;
+        }
+
+
         public bool OpenConnection() { return true; }
         public bool CloseConnection() { return true; }
     }

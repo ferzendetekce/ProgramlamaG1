@@ -35,9 +35,33 @@ namespace DevicesControllerApp.Ayarlar
 
         private void Settings_Load(object sender, EventArgs e)
         {
-            // Varsayılan dil: Türkçe (Index 0)
             if (comboBox1.Items.Count > 0)
-                comboBox1.SelectedIndex = 0;
+            {
+                // 1. Veritabanından kayıtlı dili çek
+                string savedLang = dbManager.GetLanguage();
+
+                // 2. ComboBox tetiklenmesin diye Event'i geçici olarak kapatıyoruz
+                // (Aksi takdirde seçim değiştiğinde tekrar veritabanına yazmaya çalışır)
+                comboBox1.SelectedIndexChanged -= ComboBox1_SelectedIndexChanged;
+
+                // 3. Gelen dile göre ComboBox seçimini yap
+                if (savedLang == "en")
+                {
+                    // Eğer listenizde "English" 2. sıradaysa (index 1)
+                    comboBox1.SelectedIndex = 1;
+                }
+                else
+                {
+                    // Varsayılan Türkçe (index 0)
+                    comboBox1.SelectedIndex = 0;
+                }
+
+                // 4. Arayüzdeki yazıları da o dile göre güncelle
+                DiliGuncelle(savedLang);
+
+                // 5. Event'i tekrar açıyoruz
+                comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
+            }
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
