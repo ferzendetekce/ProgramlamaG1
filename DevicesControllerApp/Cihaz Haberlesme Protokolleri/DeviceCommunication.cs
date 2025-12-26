@@ -23,6 +23,10 @@ namespace RehabilitationSystem.Communication
         private Queue<byte[]> _commandQueue;
         private readonly object _queueLock = new object();
         private List<byte> _rawRxBuffer = new List<byte>();
+        private Queue<string> _errorHistory = new Queue<string>();
+        private const int MAX_ERROR_HISTORY = 50;
+        private readonly object _errorLock = new object();
+        private string _lastError = string.Empty;
 
         // Buffer'lar
         private Queue<LoadCellDataPacket> _loadCellBuffer;
@@ -518,16 +522,62 @@ namespace RehabilitationSystem.Communication
 
         private void AddToCommandQueue(byte[] command)
         {
-            // Komut kuyruğuna ekleme
+            lock (_queueLock)
+            {
+                _commandQueue.Enqueue(command);
+                LogCommunication($"Komut kuyruğa eklendi. Kuyruk boyutu: {_commandQueue.Count}");
+            }
         }
 
         private void ProcessCommandQueue()
         {
-            // Komut kuyruğunu işleme
+            lock (_queueLock)
+            {
+                if (_commandQueue.Count == 0)
+                    return;
+
+                LogCommunication($"Komut kuyruğu işleniyor... Bekleyen komut sayısı: {_commandQueue.Count}");
+
+                while (_commandQueue.Count > 0)
+                {
+                    byte[] command = _commandQueue.Dequeue();
+
+                    if (command != null && command.Length > 0)
+                    {
+                        // Komutu gönder
+                        bool success = WriteToPort(command);
+
+                        if (!success)
+                        {
+                            LogCommunication("✗ Kuyruktan komut gönderimi başarısız!", true);
+                            break; // Hata durumunda kuyruğu durur
+                        }
+
+                        // Komutlar arası kısa bekleme
+                        Thread.Sleep(50);
+                    }
+                }
+
+                LogCommunication("Komut kuyruğu işleme tamamlandı.");
+            }
         }
 
+        public void ClearCommandQueue()
+        {
+            lock (_queueLock)
+            {
+                _commandQueue.Clear();
+                LogCommunication("Komut kuyruğu temizlendi.");
+            }
+        }
 
-
+        public int GetCommandQueueSize()
+        {
+            lock (_queueLock)
+            {
+                return _commandQueue.Count;
+            }
+        }
         private void StartReadingThread()
         {
             if (_readThread != null && _readThread.IsAlive)
@@ -715,7 +765,8 @@ namespace RehabilitationSystem.Communication
 
         public bool RequestLoadCellData()
         {
-            return false;
+            LogCommunication("LoadCell veri istemi gönderiliyor...");
+            return SendCommand((byte)CommandCode.ReadLoadCell);
         }
 
         public bool Connect()
@@ -965,32 +1016,103 @@ namespace RehabilitationSystem.Communication
         }
 
 
-        public bool StartTherapy()
+        // ✅ DOĞRU VERSIYONDEVICE
+
+        
+
+            public bool StartTherapy()
         {
             LogCommunication("Terapi başlatılıyor...");
-            return SendCommand((byte)CommandCode.StartTherapy);
+
+            // ✅ YANIT BEKLE!
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.StartTherapy, null, 2000);
+
+            if (response != null)
+            {
+                LogCommunication("✓ Terapi başlatıldı!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Terapi başlatma timeout!", true);
+                return false;
+            }
         }
 
         public bool StopTherapy()
         {
             LogCommunication("Terapi durduruluyor...");
-            return SendCommand((byte)CommandCode.StopTherapy);
+
+            // ✅ YANIT BEKLE!
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.StopTherapy, null, 2000);
+
+            if (response != null)
+            {
+                LogCommunication("✓ Terapi durduruldu!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Terapi durdurma timeout!", true);
+                return false;
+            }
         }
 
         public bool PauseTherapy()
         {
-            return SendCommand((byte)CommandCode.PauseTherapy);
+            LogCommunication("Terapi duraklatılıyor...");
+
+            // ✅ YANIT BEKLE!
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.PauseTherapy, null, 2000);
+
+            if (response != null)
+            {
+                LogCommunication("✓ Terapi duraklatıldı!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Terapi duraklatma timeout!", true);
+                return false;
+            }
         }
 
         public bool ResumeTherapy()
         {
-            return SendCommand((byte)CommandCode.ResumeTherapy);
+            LogCommunication("Terapi devam ettiriliyor...");
+
+            // ✅ YANIT BEKLE!
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.ResumeTherapy, null, 2000);
+
+            if (response != null)
+            {
+                LogCommunication("✓ Terapi devam ediyor!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Terapi devam ettirme timeout!", true);
+                return false;
+            }
         }
 
         public bool EmergencyStop()
         {
             LogCommunication("!!! ACİL DURDURMA !!!", true);
-            return SendCommand((byte)CommandCode.EmergencyStop);
+
+            // ✅ YANIT BEKLE (Acil stop için de onay almak önemli!)
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.EmergencyStop, null, 2000);
+
+            if (response != null)
+            {
+                LogCommunication("✓ Acil durdurma gerçekleşti!");
+                return true;
+            }
+            else
+            {
+                LogCommunication("✗ Acil durdurma timeout!", true);
+                return false;
+            }
         }
 
         public bool SetSpeed(double speed)
@@ -1016,12 +1138,16 @@ namespace RehabilitationSystem.Communication
 
         public bool SetWinchPosition(bool up)
         {
-            return false;
+            byte[] data = new byte[] { (byte)(up ? 0x01 : 0x00) };
+            return SendCommand((byte)CommandCode.SetWinch, data);
         }
 
         public bool LoadPattern(byte[] patternData)
         {
-            return false;
+            if (patternData == null || patternData.Length == 0)
+                return false;
+
+            return SendCommand((byte)CommandCode.LoadPattern, patternData);
         }
 
         public bool HomeDevice()
@@ -1047,63 +1173,247 @@ namespace RehabilitationSystem.Communication
 
         public int GetServoMotorPosition(int motorIndex)
         {
-            return 0;
+            LogCommunication($"Servo motor {motorIndex} pozisyonu sorgulanıyor...");
+
+            byte[] motorIndexData = new byte[] { (byte)motorIndex };
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.GetServoPosition, motorIndexData, 2000);
+
+            if (response != null && response.Length >= 4)
+            {
+                int position = BitConverter.ToInt32(response, 0);
+                LogCommunication($"✓ Servo motor {motorIndex} pozisyonu: {position}");
+                return position;
+            }
+            else
+            {
+                LogCommunication($"✗ Servo motor pozisyon okuma başarısız!", true);
+                return -1;
+            }
         }
 
         public int GetStepMotorPosition(int motorIndex)
-        {
-            return 0;
+        {        
+            return GetMotorPosition(motorIndex);
         }
 
         public bool[] GetAllServoMotorPositions()
         {
-            return null;
+            LogCommunication("Tüm servo motor pozisyonları okunuyor...");
+
+            const int SERVO_MOTOR_COUNT = 7; // 7 adet servo motor
+            bool[] positions = new bool[SERVO_MOTOR_COUNT];
+
+            for (int i = 0; i < SERVO_MOTOR_COUNT; i++)
+            {
+                int pos = GetServoMotorPosition(i);
+                positions[i] = (pos != -1); // Başarılı okuma = true
+            }
+
+            return positions;
         }
 
         public int[] GetAllStepMotorPositions()
         {
-            return null;
+            LogCommunication("Tüm step motor pozisyonları okunuyor...");
+
+            const int STEP_MOTOR_COUNT = 10; // 10 adet step motor
+            int[] positions = new int[STEP_MOTOR_COUNT];
+
+            for (int i = 0; i < STEP_MOTOR_COUNT; i++)
+            {
+                positions[i] = GetMotorPosition(i);
+            }
+
+            return positions;
         }
 
         public bool[] ReadLimitSwitches()
         {
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.ReadLimitSwitch, null, 2000);
+
+            if (response != null && response.Length > 0)
+            {
+                bool[] switches = new bool[response.Length];
+                for (int i = 0; i < response.Length; i++)
+                {
+                    switches[i] = (response[i] == 0x01);
+                }
+                return switches;
+            }
             return null;
         }
 
         public double[] ReadAllLoadCells()
         {
-            return null;
+            LogCommunication("Tüm LoadCell verileri okunuyor...");
+
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.ReadLoadCell, null, 2000);
+
+            if (response != null && response.Length >= 20)
+            {
+                // 5 kanal: RightHeel, RightToe, LeftHeel, LeftToe, Center (varsayılan)
+                double[] loadCells = new double[5];
+
+                loadCells[0] = BitConverter.ToSingle(response, 0);  // RightHeel
+                loadCells[1] = BitConverter.ToSingle(response, 4);  // RightToe
+                loadCells[2] = BitConverter.ToSingle(response, 8);  // LeftHeel
+                loadCells[3] = BitConverter.ToSingle(response, 12); // LeftToe
+                loadCells[4] = BitConverter.ToSingle(response, 16); // Center (opsiyonel)
+
+                LogCommunication($"✓ LoadCell verileri alındı: RH={loadCells[0]:F2}, RT={loadCells[1]:F2}, LH={loadCells[2]:F2}, LT={loadCells[3]:F2}");
+
+                return loadCells;
+            }
+            else
+            {
+                LogCommunication("✗ LoadCell veri okuma başarısız!", true);
+                return null;
+            }
         }
 
         public double ReadLoadCell(int channel)
         {
-            return 0.0;
+            if (channel < 0 || channel > 4)
+            {
+                LogCommunication($"✗ Geçersiz LoadCell kanalı: {channel}", true);
+                return -1;
+            }
+
+            LogCommunication($"LoadCell kanal {channel} okunuyor...");
+
+            byte[] channelData = new byte[] { (byte)channel };
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.ReadLoadCell, channelData, 2000);
+
+            if (response != null && response.Length >= 4)
+            {
+                float value = BitConverter.ToSingle(response, 0);
+                LogCommunication($"✓ LoadCell kanal {channel}: {value:F2}");
+                return value;
+            }
+            else
+            {
+                LogCommunication($"✗ LoadCell kanal {channel} okuma başarısız!", true);
+                return -1;
+            }
         }
 
         public Dictionary<string, int> GetAllPositionSensors()
         {
-            return null;
+            LogCommunication("Tüm pozisyon sensörleri okunuyor...");
+
+            Dictionary<string, int> sensors = new Dictionary<string, int>();
+
+            // Servo motorları ekle
+            for (int i = 0; i < 7; i++)
+            {
+                int pos = GetServoMotorPosition(i);
+                sensors[$"Servo_{i}"] = pos;
+            }
+
+            // Step motorları ekle
+            for (int i = 0; i < 10; i++)
+            {
+                int pos = GetMotorPosition(i);
+                sensors[$"Step_{i}"] = pos;
+            }
+
+            LogCommunication($"✓ Toplam {sensors.Count} pozisyon sensörü okundu.");
+
+            return sensors;
         }
 
         public DeviceStatus QueryDeviceStatus()
         {
-            SendCommand((byte)CommandCode.ReadStatus);
-            return null; // Yanıt asenkron olarak event ile gelecek
+            byte[] response = SendCommandAndWaitResponse((byte)CommandCode.ReadStatus, null, 2000);
+
+            if (response != null && response.Length >= 10)
+            {
+                DeviceStatus status = new DeviceStatus();
+                status.IsReady = (response[0] == 0x01);
+                status.IsRunning = (response[1] == 0x01);
+                status.IsEmergencyStopped = (response[2] == 0x01);
+                // ... daha fazla veri parse et
+
+                return status;
+            }
+
+            return null;
         }
 
         public bool IsDeviceReady()
         {
+            DeviceStatus status = QueryDeviceStatus();
+
+            if (status != null)
+            {
+                bool ready = status.IsReady && !status.IsEmergencyStopped;
+                LogCommunication($"Cihaz durumu: {(ready ? "Hazır ✓" : "Hazır değil ✗")}");
+                return ready;
+            }
+
+            LogCommunication("✗ Cihaz durum sorgulaması başarısız!", true);
             return false;
         }
 
         public string GetDeviceFirmwareVersion()
         {
-            return null;
+            LogCommunication("Firmware versiyonu sorgulanıyor...");
+
+            // Firmware version komutu (CommandCode'a eklenebilir: GetFirmwareVersion = 0x60)
+            byte[] response = SendCommandAndWaitResponse(0x60, null, 2000);
+
+            if (response != null && response.Length > 0)
+            {
+                // Versiyon formatı: "v1.2.3" (string olarak)
+                string version = System.Text.Encoding.ASCII.GetString(response).Trim('\0');
+                LogCommunication($"✓ Firmware versiyonu: {version}");
+                return version;
+            }
+            else
+            {
+                LogCommunication("✗ Firmware versiyon okuma başarısız!", true);
+                return "Unknown";
+            }
         }
 
         public Dictionary<string, bool> GetDeviceHealthStatus()
         {
-            return null;
+            LogCommunication("Cihaz sağlık durumu sorgulanıyor...");
+
+            Dictionary<string, bool> health = new Dictionary<string, bool>();
+
+            // Cihaz durumunu al
+            DeviceStatus status = QueryDeviceStatus();
+
+            if (status != null)
+            {
+                health["IsReady"] = status.IsReady;
+                health["IsRunning"] = status.IsRunning;
+                health["EmergencyStop"] = !status.IsEmergencyStopped; // Tersini alıyoruz (sağlıklı = emergency yok)
+
+                // Limit switch durumları
+                bool[] switches = ReadLimitSwitches();
+                if (switches != null)
+                {
+                    for (int i = 0; i < switches.Length; i++)
+                    {
+                        health[$"LimitSwitch_{i}"] = switches[i];
+                    }
+                }
+
+                // Port durumu
+                health["PortOpen"] = IsPortOpen();
+                health["Connected"] = IsConnected;
+
+                LogCommunication($"✓ Sağlık durumu: {health.Count} parametre okundu.");
+            }
+            else
+            {
+                LogCommunication("✗ Sağlık durumu sorgulaması başarısız!", true);
+                health["Error"] = true;
+            }
+
+            return health;
         }
 
         private void OnDeviceStatusChanged(DeviceStatus status)
@@ -1116,6 +1426,20 @@ namespace RehabilitationSystem.Communication
         private void HandleCommunicationError(Exception ex, string operation)
         {
             string msg = $"Hata ({operation}): {ex.Message}";
+
+            // Hata geçmişine ekle
+            lock (_errorLock)
+            {
+                _lastError = msg;
+
+                if (_errorHistory.Count >= MAX_ERROR_HISTORY)
+                {
+                    _errorHistory.Dequeue(); // En eski hatayı sil
+                }
+
+                _errorHistory.Enqueue($"{DateTime.Now:HH:mm:ss} - {msg}");
+            }
+
             LogCommunication(msg, true);
             OnErrorOccurred(msg, ErrorLevel.Error);
 
@@ -1139,17 +1463,50 @@ namespace RehabilitationSystem.Communication
 
         public string GetLastError()
         {
-            return null;
+            lock (_errorLock)
+            {
+                return _lastError;
+            }
         }
 
         public void ClearErrors()
         {
-            // Hata listesini temizleme
+            lock (_errorLock)
+            {
+                _errorHistory.Clear();
+                _lastError = string.Empty;
+                LogCommunication("Hata geçmişi temizlendi.");
+            }
         }
-
-        private bool RetryCommand(byte commandCode, byte[] data, int maxRetries = 3)
+        public List<string> GetErrorHistory()
         {
-            return false;
+            lock (_errorLock)
+            {
+                return new List<string>(_errorHistory);
+            }
+        }
+        private byte[] RetryCommand(byte commandCode, byte[] data, int maxRetries = 3, int timeoutMs = 1000)
+        {
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                LogCommunication($"[RETRY] Deneme {attempt}/{maxRetries} - Komut 0x{commandCode:X2}");
+
+                byte[] response = SendCommandAndWaitResponse(commandCode, data, timeoutMs);
+
+                if (response != null)
+                {
+                    LogCommunication($"[RETRY] ✓ Başarılı! Deneme: {attempt}");
+                    return response;
+                }
+
+                if (attempt < maxRetries)
+                {
+                    Thread.Sleep(200); // Denemeler arası bekleme
+                }
+            }
+
+            LogCommunication($"[RETRY] ✗ {maxRetries} deneme sonunda başarısız!", true);
+            return null;
         }
 
 
@@ -1184,14 +1541,25 @@ namespace RehabilitationSystem.Communication
 
         private double ConvertBytesToDouble(byte[] bytes)
         {
-            return 0.0;
+            if (bytes == null || bytes.Length < 8)
+            {
+                LogCommunication("✗ ConvertBytesToDouble: Yetersiz veri!", true);
+                return 0.0;
+            }
+
+            return BitConverter.ToDouble(bytes, 0);
         }
 
         private int ConvertBytesToInt(byte[] bytes)
         {
-            return 0;
-        }
+            if (bytes == null || bytes.Length < 4)
+            {
+                LogCommunication("✗ ConvertBytesToInt: Yetersiz veri!", true);
+                return 0;
+            }
 
+            return BitConverter.ToInt32(bytes, 0);
+        }
         private byte[] ConvertIntToBytes(int value)
         {
             return BitConverter.GetBytes(value);
@@ -1309,15 +1677,18 @@ namespace RehabilitationSystem.Communication
         SetSupportBar = 0x22,
         SetWeightReduction = 0x23,
         SetWinch = 0x24,
+        GetSpeed = 0x25,
         ReadLoadCell = 0x30,
         ReadLimitSwitch = 0x31,
         ReadStatus = 0x32,
         SetServoMotor = 0x40,
         SetStepMotor = 0x41,
+        GetMotorPosition = 0x42,
+        GetServoPosition = 0x43, 
         LoadPattern = 0x50,
         HomeDevice = 0x51,
-        GetSpeed = 0x25, // YENİ
-        GetMotorPosition = 0x42, // YENİ
+        GetFirmwareVersion = 0x60, 
+        GetHealthStatus = 0x61,     
     }
 
     #endregion
