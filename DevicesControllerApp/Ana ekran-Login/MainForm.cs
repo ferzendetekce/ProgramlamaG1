@@ -24,7 +24,7 @@ namespace DevicesControllerApp
     {
         // Test amaçlı, kod ile oluşturulan Log Kutusu
         private ListBox _debugLogBox;
-
+        private System.Windows.Forms.Timer _dataTimer;
         public MainForm()
         {
             InitializeComponent();
@@ -60,6 +60,20 @@ namespace DevicesControllerApp
             LogToScreen("🔴 GERÇEK CİHAZ MODU AKTİF");
             LogToScreen("STM32 F411 Nucleo bekleniyor...");
             LogToScreen("Lütfen 'Button10' ile COM9 portunu açın.");
+
+            _dataTimer = new System.Windows.Forms.Timer();
+            _dataTimer.Interval = 100; // 100 milisaniye (Saniyede 10 veri)
+            _dataTimer.Tick += _dataTimer_Tick; // Her tiklediğinde çalışacak fonksiyon
+
+        }
+
+        private void _dataTimer_Tick(object sender, EventArgs e)
+        {
+            // Eğer cihaz bağlıysa veri iste
+            if (DeviceCommunication.Instance.IsConnected)
+            {
+                DeviceCommunication.Instance.RequestLoadCellData();
+            }
         }
 
         private void InitializeCommunicationEvents()
@@ -130,23 +144,33 @@ namespace DevicesControllerApp
 
         }
 
+        // ✅ TERAPİ BAŞLAT
         private void btnTherapy_Click(object sender, EventArgs e)
         {
-            // >>> TEST: KOMUT GÖNDERME <<<
-            if (DeviceCommunication.Instance.IsConnected)
+            if (!DeviceCommunication.Instance.IsConnected)
             {
-                LogToScreen("'Terapi Başlat' komutu gönderiliyor...");
+                LogToScreen("⚠️ Port açık değil!");
+                return;
+            }
+
+            // ✅ BACKGROUND THREAD
+            Task.Run(() =>
+            {
+                this.Invoke((MethodInvoker)delegate {
+                    LogToScreen("=== TERAPİ BAŞLAT ===");
+                });
+
                 bool result = DeviceCommunication.Instance.StartTherapy();
 
-                if (result) LogToScreen("Komut başarıyla porta yazıldı.");
-                else LogToScreen("Komut gönderme başarısız!");
-            }
-            else
-            {
-                LogToScreen("Bağlantı yok! Önce 'Buton10' butonuna basarak bağlanın.");
-            }
-            // >>> TEST SONU <<<
+                this.Invoke((MethodInvoker)delegate {
+                    if (result)
+                        LogToScreen("✓ Terapi başlatıldı!");
+                    else
+                        LogToScreen("✗ Timeout!");
+                });
+            });
 
+            // UI güncelle
             Therapy s = new Therapy();
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(s);
@@ -154,15 +178,17 @@ namespace DevicesControllerApp
 
         private void btnMonitoring_Click(object sender, EventArgs e)
         {
-            // >>> TEST: ANLIK BUFFER KONTROLÜ <<<
-            // Bu butona bastığınızda o an bufferda kaç veri var görebilirsiniz
-            int count = DeviceCommunication.Instance.GetLoadCellBuffer(100).Count;
-            LogToScreen($"Buffer Durumu: Şuan hafızada {count} adet veri paketi var.");
-            // >>> TEST SONU <<<
-
+            // Sadece ekranı açsın, otomatik veri akışını terapi başlatınca yapıyoruz.
             DataMonitoring s = new DataMonitoring();
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(s);
+
+            // İsterseniz anlık tek bir veri görüp bağlantıyı test etmek için şu kalabilir:
+            if (DeviceCommunication.Instance.IsConnected)
+            {
+                LogToScreen("Anlık veri kontrolü için tek istek gönderildi.");
+                DeviceCommunication.Instance.RequestLoadCellData();
+            }
         }
 
         // Diğer butonlar standart işlevlerine devam eder
@@ -196,7 +222,7 @@ namespace DevicesControllerApp
 
         private void button10_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         // Form kapanırken bağlantıyı temizle
@@ -527,4 +553,3 @@ namespace DevicesControllerApp
         }
     }
 }
-
