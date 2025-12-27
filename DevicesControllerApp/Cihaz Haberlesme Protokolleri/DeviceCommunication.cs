@@ -1018,9 +1018,15 @@ namespace RehabilitationSystem.Communication
 
         // ✅ DOĞRU VERSIYONDEVICE
 
+<<<<<<< HEAD
 
 
         public bool StartTherapy()
+=======
+        
+
+            public bool StartTherapy()
+>>>>>>> 97da60aa201966cefec4af7dd41e7e826ba96776
         {
             LogCommunication("Terapi başlatılıyor...");
 
@@ -1192,7 +1198,11 @@ namespace RehabilitationSystem.Communication
         }
 
         public int GetStepMotorPosition(int motorIndex)
+<<<<<<< HEAD
         {
+=======
+        {        
+>>>>>>> 97da60aa201966cefec4af7dd41e7e826ba96776
             return GetMotorPosition(motorIndex);
         }
 
@@ -1684,11 +1694,19 @@ namespace RehabilitationSystem.Communication
         SetServoMotor = 0x40,
         SetStepMotor = 0x41,
         GetMotorPosition = 0x42,
+<<<<<<< HEAD
         GetServoPosition = 0x43,
         LoadPattern = 0x50,
         HomeDevice = 0x51,
         GetFirmwareVersion = 0x60,
         GetHealthStatus = 0x61,
+=======
+        GetServoPosition = 0x43, 
+        LoadPattern = 0x50,
+        HomeDevice = 0x51,
+        GetFirmwareVersion = 0x60, 
+        GetHealthStatus = 0x61,     
+>>>>>>> 97da60aa201966cefec4af7dd41e7e826ba96776
     }
 
     #endregion
