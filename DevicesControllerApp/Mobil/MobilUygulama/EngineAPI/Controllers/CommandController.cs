@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RehabilitationSystem.Communication; // DeviceCommunication'ın olduğu namespace
-// using RehabilitationSystem.Models; // Therapy modelinin olduğu namespace
+using RehabilitationSystem.EngineAPI.Services;
 
 namespace RehabilitationSystem.API.Controllers
 {
@@ -8,65 +7,304 @@ namespace RehabilitationSystem.API.Controllers
     [ApiController]
     public class CommandController : ControllerBase
     {
-        // Global servis veya static değişkene erişim (Proje yapına göre değişebilir)
-        // Örnek: TherapyService.CurrentTherapy
-        
         [HttpPost("start")]
-        public IActionResult StartTherapy()
+        public async Task<IActionResult> StartTherapy()
         {
-            // 1. Cihaza 'Başla' komutunu gönder
-            bool commandSent = DeviceCommunication.Instance.StartTherapy();
-
-            if (commandSent)
+            try
             {
-                // *** KRİTİK DEĞİŞİKLİK ***
-                // Cihazdan yanıt gelmesini beklemeden API'deki durumu hemen güncelle!
-                // Böylece mobil uygulama "isRunning: true" görür.
+                var envelope = await Engine.Start();
                 
-                // Buradaki 'CurrentTherapyService' senin projendeki terapi durumunu tutan static sınıf veya servis olmalı.
-                if (TherapyService.CurrentTherapy != null)
+                if (envelope == null)
                 {
-                    TherapyService.CurrentTherapy.IsRunning = true;
-                    TherapyService.CurrentTherapy.StatusText = "Terapi Başladı";
-                    TherapyService.CurrentTherapy.StartedAt = DateTime.Now;
-                    TherapyService.CurrentTherapy.IsPaused = false;
-                    TherapyService.CurrentTherapy.IsEmergency = false;
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
                 }
-            }
-            else
-            {
-                return StatusCode(500, new { message = "Cihaza komut gönderilemedi." });
-            }
 
-            // Güncellenmiş nesneyi geri döndür
-            return Ok(new 
-            { 
-                received = "start", 
-                status = "ok", 
-                therapy = TherapyService.CurrentTherapy 
-            });
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
         }
 
         [HttpPost("stop")]
-        public IActionResult StopTherapy()
+        public async Task<IActionResult> StopTherapy()
         {
-            bool commandSent = DeviceCommunication.Instance.StopTherapy();
-            
-            if (commandSent && TherapyService.CurrentTherapy != null)
+            try
             {
-                // Durdurma işleminde de manuel güncelleme yapalım
-                TherapyService.CurrentTherapy.IsRunning = false;
-                TherapyService.CurrentTherapy.StatusText = "Durduruldu";
-            }
+                var envelope = await Engine.Stop();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
 
-            return Ok(new 
-            { 
-                received = "stop", 
-                status = "ok", 
-                therapy = TherapyService.CurrentTherapy 
-            });
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
         }
-        
-        // Diğer komutlar (up, down vb.) burada kalabilir...
+
+        [HttpPost("pause")]
+        public async Task<IActionResult> PauseTherapy()
+        {
+            try
+            {
+                var envelope = await Engine.Pause();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("resume")]
+        public async Task<IActionResult> ResumeTherapy()
+        {
+            try
+            {
+                var envelope = await Engine.Resume();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("emergency")]
+        public async Task<IActionResult> EmergencyStop()
+        {
+            try
+            {
+                var envelope = await Engine.EmergencyStop();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("up")]
+        public async Task<IActionResult> MoveUp()
+        {
+            try
+            {
+                var envelope = await Engine.MoveUp();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("down")]
+        public async Task<IActionResult> MoveDown()
+        {
+            try
+            {
+                var envelope = await Engine.MoveDown();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("left")]
+        public async Task<IActionResult> MoveLeft()
+        {
+            try
+            {
+                var envelope = await Engine.MoveLeft();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("right")]
+        public async Task<IActionResult> MoveRight()
+        {
+            try
+            {
+                var envelope = await Engine.MoveRight();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("footincrease")]
+        public async Task<IActionResult> FootIncrease()
+        {
+            try
+            {
+                var envelope = await Engine.FootIncrease();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("footdecrease")]
+        public async Task<IActionResult> FootDecrease()
+        {
+            try
+            {
+                var envelope = await Engine.FootDecrease();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("barup")]
+        public async Task<IActionResult> BarUp()
+        {
+            try
+            {
+                var envelope = await Engine.BarUp();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("bardown")]
+        public async Task<IActionResult> BarDown()
+        {
+            try
+            {
+                var envelope = await Engine.BarDown();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("weightincrease")]
+        public async Task<IActionResult> WeightIncrease()
+        {
+            try
+            {
+                var envelope = await Engine.WeightIncrease();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("weightdecrease")]
+        public async Task<IActionResult> WeightDecrease()
+        {
+            try
+            {
+                var envelope = await Engine.WeightDecrease();
+                
+                if (envelope == null)
+                {
+                    return StatusCode(500, new { message = "Ana makineye ulaşılamadı.", error = Engine.LastError });
+                }
+
+                return Ok(envelope);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Komut gönderilemedi.", error = ex.Message });
+            }
+        }
     }
 }

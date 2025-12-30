@@ -28,7 +28,7 @@ const remoteService = async (ip, port, command) => {
     throw new Error("Oturum bulunamadı. Lütfen tekrar giriş yapın.");
   }
 
-  const apiUrl = `http://${ip}:${port}/api/Command`;
+  const apiUrl = `http://${ip}:${port}/api/command/${command}`;
   console.log(`'${command}' komutu, token ile ${apiUrl} adresine gönderiliyor...`);
 
   try {
@@ -37,8 +37,7 @@ const remoteService = async (ip, port, command) => {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}` 
-      },
-      body: JSON.stringify({ command: command })
+      }
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: `API isteği başarısız oldu. Durum Kodu: ${response.status}` }));
