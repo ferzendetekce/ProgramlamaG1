@@ -56,14 +56,16 @@ namespace DevicesControllerApp
             splitContainer2.Panel2.Controls.Add(s);
         }
 
-     
+
 
         private void btnMonitoring_Click(object sender, EventArgs e)
         {
-            DataMonitoring s = new DataMonitoring();
+            DataMonitoringControl s = new DataMonitoringControl();
+            s.Dock = DockStyle.Fill;
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(s);
         }
+
 
         private void btnUsers_Click(object sender, EventArgs e)
         {
@@ -77,6 +79,11 @@ namespace DevicesControllerApp
             Therapy s = new Therapy();
             splitContainer2.Panel2.Controls.Clear();
             splitContainer2.Panel2.Controls.Add(s);
+        }
+
+        private void splitContainer2_Panel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

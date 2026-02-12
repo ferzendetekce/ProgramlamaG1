@@ -84,6 +84,7 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -149,11 +150,11 @@
     <Compile Include="Terapi\Therapy.Designer.cs">
       <DependentUpon>Therapy.cs</DependentUpon>
     </Compile>
-    <Compile Include="Veri izleme\DataMonitoring.cs">
+    <Compile Include="Veri izleme\DataMonitoringControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Veri izleme\DataMonitoring.Designer.cs">
-      <DependentUpon>DataMonitoring.cs</DependentUpon>
+    <Compile Include="Veri izleme\DataMonitoringControl.Designer.cs">
+      <DependentUpon>DataMonitoringControl.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Ana ekran-Login\Login.resx">
       <DependentUpon>Login.cs</DependentUpon>
@@ -188,8 +189,8 @@
     <EmbeddedResource Include="Terapi\Therapy.resx">
       <DependentUpon>Therapy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Veri izleme\DataMonitoring.resx">
-      <DependentUpon>DataMonitoring.cs</DependentUpon>
+    <EmbeddedResource Include="Veri izleme\DataMonitoringControl.resx">
+      <DependentUpon>DataMonitoringControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
